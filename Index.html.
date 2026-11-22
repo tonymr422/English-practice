@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily English Coach — A1, A2, Diario & Q&A</title>
+  <style>
+    :root {
+      --bg: #090e1a;
+      --sidebar: #101727;
+      --card: #172033;
+      --card-inner: #0c1322;
+      --theory-bg: #121b2e;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --accent: #38bdf8;
+      --gold: #fbbf24;
+      --purple: #c084fc;
+      --success: #10b981;
+      --error: #f87171;
+      --border: #26334d;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Panel Izquierdo (Temario) */
+    .sidebar {
+      width: 315px;
+      flex-shrink: 0;
+      background-color: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+
+    .sidebar-header {
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stats-pill {
+      background-color: var(--card-inner);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .level-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .level-tab {
+      padding: 7px 6px;
+      border: 1px solid var(--border);
+      background-color: var(--card-inner);
+      color: var(--muted);
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .level-tab.active {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    }
+
+    .topics-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    .topics-list::-webkit-scrollbar { width: 6px; }
+    .topics-list::-webkit-scrollbar-thumb { background: #26334d; border-radius: 3px; }
+
+    .unit-group { margin-bottom: 14px; }
+
+    .unit-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      padding: 6px 10px;
+      font-weight: 700;
+    }
+
+    .topic-btn {
+      width: 100%;
+      text-align: left;
+      padding: 9px 12px;
+      margin-bottom: 4px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      color: #cbd5e1;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+
+    .topic-btn:hover { background-color: rgba(38, 51, 77, 0.55); }
+
+    .topic-btn.active {
+      background-color: rgba(59, 130, 246, 0.18);
+      border-color: rgba(59, 130, 246, 0.6);
+      color: white;
+      font-weight: 600;
+    }
+
+    .topic-status { font-size: 0.8rem; color: var(--muted); flex-shrink: 0; }
+    .topic-btn.completed .topic-status { color: var(--success); }
+
+    /* Contenedor Central + Derecho */
+    .workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 24px;
+      gap: 14px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .top-left-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .mic-session-btn {
+      background-color: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .mic-session-btn.ready {
+      background-color: rgba(16, 185, 129, 0.24);
+      border-color: var(--success);
+      color: #a7f3d0;
+    }
+
+    .toggle-theory-btn {
+      background-color: rgba(192, 132, 252, 0.14);
+      border: 1px solid rgba(192, 132, 252, 0.4);
+      color: #e9d5ff;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .toggle-theory-btn:hover {
+      background-color: rgba(192, 132, 252, 0.24);
+    }
+
+    .streak-banner {
+      font-size: 0.84rem;
+      color: var(--muted);
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 10px;
+    }
+
+    .columns-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.9fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .columns-grid.theory-hidden {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 780px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .columns-grid.theory-hidden .theory-panel {
+      display: none;
+    }
+
+    /* Tarjeta de Práctica */
+    .practice-card {
+      background-color: var(--card);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 24px 40px -12px rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border);
+    }
+
+    .topic-header { margin-bottom: 16px; }
+
+    .topic-badge {
+      display: inline-block;
+      background-color: rgba(56, 189, 248, 0.14);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .topic-header h1 {
+      font-size: 1.4rem;
+      color: var(--text);
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: var(--card-inner);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 22px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      width: 0%;
+      transition: width 0.35s ease;
+    }
+
+    .flashcard {
+      background-color: var(--card-inner);
+      border-radius: 14px;
+      padding: 26px 22px;
+      text-align: center;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .question-box {
+      background-color: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 0.98rem;
+      color: #bfdbfe;
+    }
+
+    .question-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      font-weight: 700;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .prompt-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+
+    .phonetic-ipa {
+      font-size: 1.02rem;
+      color: var(--accent);
+      font-family: monospace;
+      margin-bottom: 6px;
+    }
+
+    .phonetic-es {
+      font-size: 1.04rem;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .meaning-text {
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      margin-bottom: 10px;
+    }
+
+    .tip-box {
+      font-size: 0.84rem;
+      color: var(--muted);
+      background-color: rgba(30, 41, 59, 0.7);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: inline-block;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    button.action-btn {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 11px;
+      font-size: 0.93rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: transform 0.1s, background-color 0.2s, opacity 0.2s;
+    }
+
+    button.action-btn:active { transform: scale(0.97); }
+    button.action-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-listen { background-color: #26334d; color: white; }
+    .btn-listen:hover { background-color: #334566; }
+
+    .btn-slow { background-color: #131c2e; color: #cbd5e1; border: 1px solid var(--border); }
+    .btn-slow:hover { background-color: #1d2a44; }
+
+    .btn-mic { background: linear-gradient(135deg, #2563eb, #3b82f6); color: white; }
+    .btn-mic:hover { background: linear-gradient(135deg, #1d4ed8, #2563eb); }
+    .btn-mic.recording {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .feedback {
+      min-height: 54px;
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.93rem;
+      background-color: rgba(12, 19, 34, 0.75);
+      border: 1px solid transparent;
+    }
+
+    .feedback.success { color: #6ee7b7; border-color: rgba(16, 185, 129, 0.4); }
+    .feedback.error { color: #fca5a5; border-color: rgba(248, 113, 113, 0.4); }
+
+    .footer-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .text-link { cursor: pointer; text-decoration: underline; }
+    .text-link:hover { color: var(--text); }
+
+    /* Panel Derecho de Teoría */
+    .theory-panel {
+      background-color: var(--theory-bg);
+      border-radius: 18px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .theory-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .theory-header h2 {
+      font-size: 1.08rem;
+      color: #f3e8ff;
+    }
+
+    .rule-pill {
+      display: inline-block;
+      background-color: rgba(192, 132, 252, 0.16);
+      color: var(--purple);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    .theory-body {
+      font-size: 0.92rem;
+      line-height: 1.58;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+
+    .structure-box {
+      background-color: var(--card-inner);
+      border: 1px solid #2a3b5c;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    .structure-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .structure-formula {
+      font-family: monospace;
+      font-size: 0.88rem;
+      color: #f8fafc;
+      line-height: 1.45;
+    }
+
+    .mini-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      background-color: rgba(15, 23, 42, 0.65);
+      border-left: 3px solid var(--gold);
+      padding: 10px 12px;
+      border-radius: 0 8px 8px 0;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1120px) {
+      .columns-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 860px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; max-height: 280px; position: relative; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PANEL IZQUIERDO: TEMARIO -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-row">
+        <div class="brand-title">🎯 Daily English Coach</div>
+        <div class="stats-pill" id="xp-pill">⭐ 0 XP</div>
+      </div>
+      <div class="level-tabs">
+        <button class="level-tab active" id="tab-A1" onclick="switchLevel('A1')">A1</button>
+        <button class="level-tab" id="tab-A2" onclick="switchLevel('A2')">A2</button>
+        <button class="level-tab" id="tab-DAILY" onclick="switchLevel('DAILY')">☀️ Diario</button>
+        <button class="level-tab" id="tab-QA" onclick="switchLevel('QA')">⚡ Q&A</button>
+      </div>
+    </div>
+    <div class="topics-list" id="topics-list"></div>
+  </aside>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="workspace">
+    <div class="top-bar">
+      <div class="top-left-group">
+        <button class="mic-session-btn" id="mic-session-btn" onclick="requestPersistentMic()">
+          🎙️ Habilitar Micrófono (1 sola vez)
+        </button>
+        <button class="toggle-theory-btn" id="toggle-theory-btn" onclick="toggleTheoryPanel()">
+          📘 Ocultar / Ver Teoría
+        </button>
+      </div>
+      <div class="streak-banner" id="streak-banner">🔥 Racha: 0 días</div>
+    </div>
+
+    <div class="columns-grid" id="columns-grid">
+      <!-- PANEL CENTRAL: PRÁCTICA -->
+      <main class="practice-card">
+        <div class="topic-header">
+          <span class="topic-badge" id="topic-badge">A1 • Unidad 1</span>
+          <h1 id="topic-title">1A. Saludos y países</h1>
+        </div>
+
+        <div class="progress-info">
+          <span id="card-step">Tarjeta 1 de 6</span>
+          <span id="lock-hint">🔒 Pronuncia bien para avanzar</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <div class="flashcard">
+          <div class="question-box" id="question-box" style="display:none;">
+            <span class="question-label">❓ Pregunta</span>
+            <div id="question-text"></div>
+          </div>
+          <div class="prompt-text" id="prompt-text">Hello, nice to meet you</div>
+          <div class="phonetic-ipa" id="phonetic-ipa">/həˈloʊ naɪs tə miːt juː/</div>
+          <div class="phonetic-es" id="phonetic-es">🗣️ jelóu, náis tu míit iu</div>
+          <div class="meaning-text" id="meaning-text">Hola, mucho gusto en conocerte</div>
+          <div class="tip-box" id="tip-box">💡 Tip: La "h" en "hello" suena suave como una "j" aspirada.</div>
+        </div>
+
+        <div class="controls">
+          <button class="action-btn btn-listen" id="listen-btn">🔊 Respuesta</button>
+          <button class="action-btn btn-slow" id="slow-btn">🐢 Lento</button>
+          <button class="action-btn btn-mic" id="mic-btn">🎤 Responder</button>
+        </div>
+
+        <div class="feedback" id="feedback">
+          Habilita el micrófono una vez arriba y luego presiona <strong>"Responder"</strong> para hablar.
+        </div>
+
+        <div class="footer-actions">
+          <span class="text-link" id="restart-topic-btn">Reiniciar este tema</span>
+          <span class="text-link" id="reset-all-btn">Borrar todo el progreso</span>
+        </div>
+      </main>
+
+      <!-- PANEL DERECHO: TEORÍA Y POR QUÉ SE ESCRIBE ASÍ -->
+      <aside class="theory-panel" id="theory-panel">
+        <div class="theory-header">
+          <span>📘</span>
+          <h2>Guía Gramatical y Reglas</h2>
+        </div>
+        <div class="rule-pill" id="rule-pill">Regla: Verbo "be" y preguntas</div>
+        <p class="theory-body" id="theory-body">
+          En inglés, las preguntas con el verbo <strong>be</strong> invierten el orden respecto a una afirmación: primero va el verbo (<em>are</em>) y luego el sujeto (<em>you</em>).
+        </p>
+        <div class="structure-box">
+          <div class="structure-label">Estructura base</div>
+          <div class="structure-formula" id="structure-formula">[Wh-word] + be + sujeto + complemento</div>
+        </div>
+        <div class="mini-note" id="mini-note">
+          <strong>¿Por qué se escribe así?</strong> A diferencia del español, el sujeto (<em>I, you, we</em>) casi nunca se omite y los gentilicios/países siempre van con mayúscula inicial.
+        </div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+  const database = {
+    A1: [
+      {
+        unit: "Unidad 1: Presentaciones y Trabajos",
+        topics: [
+          {
+            id: "a1_1a",
+            title: "1A. Saludos y países",
+            rule: "Verbo 'be' (I / you) y mayúsculas",
+            theory: "El verbo 'to be' en presente con 'you/we/they' usa 'are', y con 'I' usa 'am' (o su contracción 'I'm'). En inglés, los nombres de países y nacionalidades siempre comienzan con mayúscula.",
+            formula: "Afirmativa: Sujeto + am/are + ... | Pregunta: (Wh-) + Are + you + from...?",
+            why: "No se dice 'I from Argentina' porque falta el verbo 'am'. Decir 'I'm' une el pronombre con el verbo en habla cotidiana.",
+            items: [
+              { text: "Hello, nice to meet you", alt: [], ipa: "/həˈloʊ naɪs tə miːt juː/", es: "jelóu, náis tu míit iu", meaning: "Hola, mucho gusto en conocerte", tip: "En 'meet' la doble 'e' es larga ('míit')." },
+              { text: "Where are you from", alt: [], ipa: "/wer ɑːr juː frɒm/", es: "uér ar iu from", meaning: "¿De dónde eres?", tip: "'Where' suena parecido a 'uér', sin arrastrar fuerte." },
+              { text: "I'm from Argentina", alt: ["i am from argentina"], ipa: "/aɪm frɒm ˌɑːrdʒənˈtiːnə/", es: "áim from ar-yen-tíi-na", meaning: "Soy de Argentina", tip: "El acento principal en inglés va en 'ti': ar-yen-TÍI-na." },
+              { text: "Are you here for the conference", alt: [], ipa: "/ɑːr juː hɪər fɔːr ðə ˈkɒnfərəns/", es: "ar iu jíar for de kón-fe-rens", meaning: "¿Estás aquí por la conferencia?", tip: "'Here' suena como 'jíar'." },
+              { text: "You aren't late", alt: ["you are not late"], ipa: "/juː ɑːrnt leɪt/", es: "iu arnt léit", meaning: "No llegas tarde", tip: "'Late' termina con sonido seco de 't' ('léit')." },
+              { text: "I'm not a teacher", alt: ["i am not a teacher"], ipa: "/aɪm nɒt ə ˈtiːtʃər/", es: "áim not a tíi-cher", meaning: "No soy profesor", tip: "'Teacher' lleva 'i' larga al inicio y 'er' suave al final." }
+            ]
+          },
+          {
+            id: "a1_1b",
+            title: "1B. Trabajos y profesiones",
+            rule: "Verbo 'be' (he/she/it) y artículos a/an",
+            theory: "Con 'he', 'she' e 'it' usamos 'is' (o la contracción 's: he's, she's, it's). Al hablar de profesiones en singular, se coloca 'a' antes de sonido consonante y 'an' antes de sonido vocálico.",
+            formula: "Sujeto (he/she/it) + is ('s) / isn't + a/an + profesión",
+            why: "Usamos 'an office worker' (y no 'a office worker') porque 'office' empieza con sonido de vocal (/ɒ/).",
+            items: [
+              { text: "He's a football player", alt: ["he is a football player"], ipa: "/hiːz ə ˈfʊtbɔːl ˈpleɪər/", es: "jiis a fút-bol pléi-er", meaning: "Él es jugador de fútbol", tip: "'Football' suena más como 'fút-bol' con 'u' corta." },
+              { text: "She's a doctor", alt: ["she is a doctor"], ipa: "/ʃiːz ə ˈdɒktər/", es: "shiis a dók-tor", meaning: "Ella es doctora", tip: "'She's' empieza con 'sh' suave ('shiis')." },
+              { text: "I'm an office worker", alt: ["i am an office worker"], ipa: "/aɪm ən ˈɒfɪs ˈwɜːrkər/", es: "áim an ó-fis uér-ker", meaning: "Soy empleado de oficina", tip: "'Worker' empieza con sonido de 'u' ('uér-ker')." },
+              { text: "Is he a taxi driver", alt: [], ipa: "/ɪz hiː ə ˈtæksi ˈdraɪvər/", es: "is ji a ták-si drái-ver", meaning: "¿Él es taxista?", tip: "'Driver' rima con 'drái-ver'." },
+              { text: "She isn't a nurse", alt: ["she is not a nurse"], ipa: "/ʃiː ˈɪznt ə nɜːrs/", es: "shi í-sent a ners", meaning: "Ella no es enfermera", tip: "'Nurse' tiene vocal central 'er' ('ners')." },
+              { text: "My brother is a pilot", alt: [], ipa: "/maɪ ˈbrʌðər ɪz ə ˈpaɪlət/", es: "mái brá-der is a pái-lot", meaning: "Mi hermano es piloto", tip: "'Pilot' suena como 'pái-lot'." }
+            ]
+          },
+          {
+            id: "a1_1c",
+            title: "1C. Nacionalidades e información",
+            rule: "Plural con 'they/we' y preguntas con 'how/what'",
+            theory: "Para grupos o varias personas usamos 'we' o 'they' junto con 'are' ('re) o 'aren't'. Las preguntas de información comienzan con palabras interrogativas como 'What' o 'How'.",
+            formula: "We/They + are ('re) / aren't + ... | How/What + auxiliar + sujeto + verbo",
+            why: "En 'How do you spell...?', el auxiliar 'do' permite formar la pregunta en presente simple sin alterar el verbo principal 'spell'.",
+            items: [
+              { text: "She's Argentinian", alt: ["she is argentinian"], ipa: "/ʃiːz ˌɑːrdʒənˈtɪniən/", es: "shiis ar-yen-tí-nian", meaning: "Ella es argentina", tip: "Enfatiza 'TÍ' en ar-yen-TÍ-nian." },
+              { text: "They're from all over the world", alt: ["they are from all over the world"], ipa: "/ðer frɒm ɔːl ˈoʊvər ðə wɜːrld/", es: "déir from ol óu-ver de uérld", meaning: "Son de todas partes del mundo", tip: "'World' se pronuncia cerca de 'uérld'." },
+              { text: "We aren't British", alt: ["we are not british"], ipa: "/wiː ɑːrnt ˈbrɪtɪʃ/", es: "uí arnt brí-tish", meaning: "No somos británicos", tip: "'British' lleva acento en 'BRÍ'." },
+              { text: "What's your phone number", alt: ["what is your phone number"], ipa: "/wɒts jɔːr foʊn ˈnʌmbər/", es: "uóts ior fóun nám-ber", meaning: "¿Cuál es tu número de teléfono?", tip: "'Number' suena como 'nám-ber'." },
+              { text: "How do you spell your name", alt: [], ipa: "/haʊ duː juː spel jɔːr neɪm/", es: "jáu du iu spel ior néim", meaning: "¿Cómo se deletrea tu nombre?", tip: "'How' suena como 'jáu'." },
+              { text: "Can you say that again", alt: [], ipa: "/kæn juː seɪ ðæt əˈɡen/", es: "kan iu séi dat a-guén", meaning: "¿Puedes repetir eso?", tip: "'Again' suele sonar como 'a-guén' o 'a-guín'." }
+            ]
+          }
+        ]
+      },
+      {
+        unit: "Unidad 2: Familia, Objetos y Números",
+        topics: [
+          {
+            id: "a1_2a",
+            title: "2A. Familia y posesivos",
+            rule: "Posesivo con 's y adjetivos posesivos",
+            theory: "Para indicar pertenencia o relación familiar se añade `'s` al poseedor (ej. 'my wife's name'). También se usan adjetivos posesivos: my, your, his, her, its, our, their.",
+            formula: "Poseedor + 's + cosa/persona | Adjetivo posesivo + sustantivo",
+            why: "En inglés no se dice 'the name of my wife' como estructura principal; se escribe 'my wife's name' poniendo primero a quien posee.",
+            items: [
+              { text: "This is a photo of my family", alt: [], ipa: "/ðɪs ɪz ə ˈfoʊtoʊ əv maɪ ˈfæməli/", es: "dis is a fóu-tou ov mái fá-mi-li", meaning: "Esta es una foto de mi familia", tip: "'Photo' empieza con 'f' y lleva 'óu' ('fóu-tou')." },
+              { text: "My wife's name is Maria", alt: [], ipa: "/maɪ waɪfs neɪm ɪz məˈriːə/", es: "mái uáifs néim is Ma-rí-a", meaning: "El nombre de mi esposa es María", tip: "El posesivo `'s` después de 'wife' suena como 's' ('uáifs')." },
+              { text: "His sister is a nurse", alt: [], ipa: "/hɪz ˈsɪstər ɪz ə nɜːrs/", es: "jis sís-ter is a ners", meaning: "Su hermana es enfermera", tip: "'His' (de él) tiene 'z' suave al final ('jis')." },
+              { text: "Their parents are from Spain", alt: [], ipa: "/ðer ˈperənts ɑːr frɒm speɪn/", es: "déir pé-rents ar from Spéin", meaning: "Sus padres son de España", tip: "'Their' (de ellos) suena como 'déir'." },
+              { text: "We haven't got any children", alt: ["we have not got any children"], ipa: "/wiː ˈhævnt ɡɒt ˈeni ˈtʃɪldrən/", es: "uí já-vent got é-ni chíl-dren", meaning: "No tenemos hijos", tip: "'Children' es el plural de 'child' ('chíl-dren')." },
+              { text: "What's your brother's job", alt: ["what is your brother's job"], ipa: "/wɒts jɔːr ˈbrʌðərz dʒɒb/", es: "uóts ior brá-ders yob", meaning: "¿Cuál es el trabajo de tu hermano?", tip: "'Brother' lleva 'th' sonora ('brá-der')." }
+            ]
+          },
+          {
+            id: "a1_2b",
+            title: "2B. Objetos diarios (this/that/these/those)",
+            rule: "Demostrativos: cercanía y número",
+            theory: "'This' (singular) y 'these' (plural) señalan cosas cerca. 'That' (singular) y 'those' (plural) señalan cosas lejos o separadas.",
+            formula: "Cerca: this (sing.) / these (pl.) | Lejos: that (sing.) / those (pl.)",
+            why: "El demostrativo siempre concuerda en número con el sustantivo: 'this computer' (uno) frente a 'these keys' (varias).",
+            items: [
+              { text: "This is my new computer", alt: [], ipa: "/ðɪs ɪz maɪ njuː kəmˈpjuːtər/", es: "dis is mái niú kom-piú-ter", meaning: "Esta es mi computadora nueva", tip: "'This' es corto ('dis') y 'these' es más largo ('díis')." },
+              { text: "These are my keys", alt: [], ipa: "/ðiːz ɑːr maɪ kiːz/", es: "díis ar mái kíis", meaning: "Estas son mis llaves", tip: "'Keys' suena igual que 'kiss' alargado ('kíis')." },
+              { text: "What's in that box", alt: ["what is in that box"], ipa: "/wɒts ɪn ðæt bɒks/", es: "uóts in dat boks", meaning: "¿Qué hay en esa caja?", tip: "'Box' suena seco y corto ('boks')." },
+              { text: "Are those your books", alt: [], ipa: "/ɑːr ðoʊz jɔːr bʊks/", es: "ar dóus ior buks", meaning: "¿Son esos tus libros?", tip: "'Books' tiene 'u' corta ('buks')." },
+              { text: "Where is my phone", alt: ["where's my phone"], ipa: "/wer ɪz maɪ foʊn/", es: "uér is mái fóun", meaning: "¿Dónde está mi teléfono?", tip: "'Phone' lleva diptongo 'óu' ('fóun')." },
+              { text: "It's on the desk", alt: ["it is on the desk"], ipa: "/ɪts ɒn ðə desk/", es: "its on de desk", meaning: "Está sobre el escritorio", tip: "'On' significa sobre/encima; 'in' es dentro." }
+            ]
+          },
+          {
+            id: "a1_2c",
+            title: "2C-2D. Números (1-100) y compras",
+            rule: "Acento en números '-teen' vs '-ty' y precios",
+            theory: "Los números del 13 al 19 terminan en '-teen' y llevan acento en la última sílaba. Las decenas (30, 40, 50...) terminan en '-ty' y llevan acento en la primera sílaba.",
+            formula: "Precios: How much is/are + objeto? | Pago: by card / in cash",
+            why: "Diferenciar 'thir-TEEN' (13) de 'THIR-ty' (30) evita confusiones frecuentes al escuchar edades, horas o cantidades.",
+            items: [
+              { text: "Thirty", alt: ["30"], ipa: "/ˈθɜːrti/", es: "zér-ti", meaning: "Número 30", tip: "En 'thirty' el acento va en la primera sílaba ('ZÉR-ti')." },
+              { text: "Thirteen", alt: ["13"], ipa: "/ˌθɜːrˈtiːn/", es: "zer-tíin", meaning: "Número 13", tip: "En 'thirteen' el acento va al final ('zer-TÍIN')." },
+              { text: "Seventy five", alt: ["75"], ipa: "/ˈsevnti faɪv/", es: "sé-ven-ti fáiv", meaning: "Número 75", tip: "'Five' termina con sonido de 'v' ('fáiv')." },
+              { text: "How old is your father", alt: [], ipa: "/haʊ oʊld ɪz jɔːr ˈfɑːðər/", es: "jáu óuld is ior fá-der", meaning: "¿Cuántos años tiene tu padre?", tip: "'Old' suena como 'óuld'." },
+              { text: "How much is this book", alt: [], ipa: "/haʊ mʌtʃ ɪz ðɪs bʊk/", es: "jáu mach is dis buk", meaning: "¿Cuánto cuesta este libro?", tip: "'How much' se usa para precio o cantidad incontable." },
+              { text: "Can I pay by card", alt: [], ipa: "/kæn aɪ peɪ baɪ kɑːrd/", es: "kan ái péi bái kard", meaning: "¿Puedo pagar con tarjeta?", tip: "Decimos 'by card' (con tarjeta) y 'in cash' (en efectivo)." }
+            ]
+          }
+        ]
+      },
+      {
+        unit: "Unidad 3: Ciudad, Casa y Direcciones",
+        topics: [
+          {
+            id: "a1_3a",
+            title: "3A-3B. En la ciudad y en casa (There is/are)",
+            rule: "Existencia: 'there is' (singular) y 'there are' (plural)",
+            theory: "Usamos 'there is' ('there's') para un elemento o sustantivos incontables (como 'wifi'), y 'there are' para plurales. En preguntas y negativas plurales se suele usar 'any'.",
+            formula: "Sing: There's / There isn't + a/an... | Pl: There are / There aren't + any...",
+            why: "Decimos 'Is there wifi?' sin artículo 'a' porque 'wifi' se trata como sustantivo incontable en este contexto.",
+            items: [
+              { text: "There's a train station", alt: ["there is a train station"], ipa: "/ðerz ə treɪn ˈsteɪʃn/", es: "dérs a tréin stéi-shon", meaning: "Hay una estación de tren", tip: "'Station' suena como 'stéi-shon'." },
+              { text: "There are three good cafes", alt: ["there are 3 good cafes"], ipa: "/ðer ɑːr θriː ɡʊd ˈkæfeɪz/", es: "der ar zrii gud ka-féis", meaning: "Hay tres buenas cafeterías", tip: "'Three' lleva lengua entre los dientes al inicio." },
+              { text: "There aren't any supermarkets", alt: ["there are not any supermarkets"], ipa: "/ðer ɑːrnt ˈeni ˈsuːpərmɑːrkɪts/", es: "der arnt é-ni sú-per-mar-kets", meaning: "No hay ningún supermercado", tip: "Usamos 'any' en oraciones negativas plurales." },
+              { text: "Is there wifi in the flat", alt: [], ipa: "/ɪz ðer ˈwaɪfaɪ ɪn ðə flæt/", es: "is der uái-fai in de flat", meaning: "¿Hay wifi en el departamento?", tip: "'Flat' es departamento en inglés británico." },
+              { text: "How many bedrooms are there", alt: [], ipa: "/haʊ ˈmeni ˈbedruːmz ɑːr ðer/", es: "jáu mé-ni béd-rums ar der", meaning: "¿Cuántos dormitorios hay?", tip: "'How many' se usa para cosas contables." },
+              { text: "There isn't an oven in the kitchen", alt: ["there is not an oven in the kitchen"], ipa: "/ðer ˈɪznt ən ˈʌvn ɪn ðə ˈkɪtʃɪn/", es: "der í-sent an á-ven in de kí-chen", meaning: "No hay horno en la cocina", tip: "'Oven' empieza con sonido de 'a' ('á-ven')." }
+            ]
+          },
+          {
+            id: "a1_3c",
+            title: "3C-3D. Describir lugares y direcciones",
+            rule: "Posición de adjetivos e imperativos de dirección",
+            theory: "Los adjetivos en inglés no cambian en plural y van ANTES del sustantivo ('a quiet town'), o DESPUÉS del verbo 'be' ('the hotel is expensive').",
+            formula: "Adjetivo + Sustantivo | Sujeto + be + Adjetivo | Imperativo: Verbo base",
+            why: "En inglés decimos 'six small shops' (adjetivo antes del sustantivo), al revés que en español ('tiendas pequeñas').",
+            items: [
+              { text: "This is a quiet town", alt: [], ipa: "/ðɪs ɪz ə ˈkwaɪət taʊn/", es: "dis is a kuái-et táun", meaning: "Este es un pueblo tranquilo", tip: "'Quiet' suena como 'kuái-et'." },
+              { text: "The hotel is very expensive", alt: [], ipa: "/ðə hoʊˈtel ɪz ˈveri ɪkˈspensɪv/", es: "de jou-tél is vé-ri iks-pén-siv", meaning: "El hotel es muy caro", tip: "'Expensive' lleva acento en 'PEN'." },
+              { text: "Excuse me, where's the cinema", alt: ["excuse me where is the cinema"], ipa: "/ɪkˈskjuːz miː werz ðə ˈsɪnəmə/", es: "iks-kiús mi, uérs de sí-ne-ma", meaning: "Disculpe, ¿dónde está el cine?", tip: "'Cinema' empieza con 's' ('sí-ne-ma')." },
+              { text: "Go straight on and turn left", alt: [], ipa: "/ɡoʊ streɪt ɒn ənd tɜːrn left/", es: "góu stréit on and tern left", meaning: "Sigue derecho y gira a la izquierda", tip: "'Straight' tiene 'ei' larga ('stréit')." },
+              { text: "Go past the bank", alt: [], ipa: "/ɡoʊ pɑːst ðə bæŋk/", es: "góu past de bank", meaning: "Pasa el banco", tip: "'Go past' significa pasar por delante de algo." },
+              { text: "It's next to the restaurant", alt: ["it is next to the restaurant"], ipa: "/ɪts nekst tə ðə ˈrestrɒnt/", es: "its nekst tu de rés-tront", meaning: "Está al lado del restaurante", tip: "'Next to' significa al lado de." }
+            ]
+          }
+        ]
+      },
+      {
+        unit: "Unidad 4: Personas, Viajes y Hora",
+        topics: [
+          {
+            id: "a1_4a",
+            title: "4A-4B. Describir personas y equipaje (have got)",
+            rule: "Uso de 'have got' / 'has got'",
+            theory: "'Have got' (o 'has got' con he/she/it) expresa posesión o características físicas. En preguntas se coloca 'Have/Has' delante del sujeto.",
+            formula: "I/You/We/They + have got ('ve got) | He/She/It + has got ('s got)",
+            why: "Es una estructura muy común en inglés británico para hablar de objetos que llevas encima, familia o rasgos físicos.",
+            items: [
+              { text: "I've got brown hair and brown eyes", alt: ["i have got brown hair and brown eyes"], ipa: "/aɪv ɡɒt braʊn her ənd braʊn aɪz/", es: "áiv got bráun jer and bráun áis", meaning: "Tengo pelo castaño y ojos marrones", tip: "'Eyes' suena igual que 'ice' ('áis')." },
+              { text: "He's got a beard", alt: ["he has got a beard"], ipa: "/hiːz ɡɒt ə bɪərd/", es: "jiis got a bíard", meaning: "Él tiene barba", tip: "'Beard' suena como 'bíard'." },
+              { text: "Have you got your passport", alt: [], ipa: "/hæv juː ɡɒt jɔːr ˈpɑːspɔːrt/", es: "jav iu got ior pás-port", meaning: "¿Tienes tu pasaporte?", tip: "'Passport' lleva acento en 'PAS'." },
+              { text: "I need a bottle of water", alt: [], ipa: "/aɪ niːd ə ˈbɒtl əv ˈwɔːtər/", es: "ái níid a bó-tel ov uó-ter", meaning: "Necesito una botella de agua", tip: "En inglés americano 'water' suena suave ('uó-der')." },
+              { text: "Don't forget your sunglasses", alt: ["do not forget your sunglasses"], ipa: "/doʊnt fərˈɡet jɔːr ˈsʌnɡlɑːsɪz/", es: "dóunt for-guét ior sán-gla-sis", meaning: "No olvides tus gafas de sol", tip: "'Forget' lleva acento en 'GET'." },
+              { text: "She hasn't got a coat", alt: ["she has not got a coat"], ipa: "/ʃiː ˈhæznt ɡɒt ə koʊt/", es: "shi já-sent got a kóut", meaning: "Ella no tiene abrigo", tip: "'Coat' suena como 'kóut'." }
+            ]
+          },
+          {
+            id: "a1_4c",
+            title: "4C-4D. Consejos y decir la hora",
+            rule: "Imperativos y expresiones de hora ('past' / 'to')",
+            theory: "Los imperativos dan instrucciones o consejos directos sin sujeto ('Visit...', 'Don't take...'). Para la hora, 'past' indica minutos después de la hora y 'to' minutos que faltan para la siguiente.",
+            formula: "Imperativo: Verbo / Don't + verbo | Hora: It's + [minutos] + past/to + [hora]",
+            why: "En 'Don't take taxis', el verbo va en forma base tras 'don't', sin conjugar.",
+            items: [
+              { text: "Don't take taxis, they're expensive", alt: ["do not take taxis they are expensive"], ipa: "/doʊnt teɪk ˈtæksiz ðer ɪkˈspensɪv/", es: "dóunt téik ták-sis, déir iks-pén-siv", meaning: "No tomes taxis, son caros", tip: "Los imperativos negativos empiezan con 'Don't + verbo'." },
+              { text: "Visit the museum and take photos", alt: [], ipa: "/ˈvɪzɪt ðə mjuˈziːəm ənd teɪk ˈfoʊtoʊz/", es: "ví-sit de miu-sí-am and téik fóu-tous", meaning: "Visita el museo y toma fotos", tip: "'Museum' lleva acento en 'SEU' (miu-SÍ-am)." },
+              { text: "What time is it", alt: [], ipa: "/wɒt taɪm ɪz ɪt/", es: "uót táim is it", meaning: "¿Qué hora es?", tip: "'Time' tiene 'ai' ('táim')." },
+              { text: "It's quarter past six", alt: ["it is quarter past six"], ipa: "/ɪts ˈkwɔːrtər pɑːst sɪks/", es: "its kuór-ter past siks", meaning: "Son las seis y cuarto", tip: "'Quarter past' = y cuarto (15 minutos después)." },
+              { text: "It's half past eleven", alt: ["it is half past eleven"], ipa: "/ɪts hɑːf pɑːst ɪˈlevn/", es: "its jaf past i-lé-ven", meaning: "Son las once y media", tip: "En 'half' la 'l' es muda ('jaf')." },
+              { text: "The train leaves at quarter to five", alt: [], ipa: "/ðə treɪn liːvz æt ˈkwɔːrtər tə faɪv/", es: "de tréin líivs at kuór-ter tu fáiv", meaning: "El tren sale a las cinco menos cuarto", tip: "'Quarter to' = menos cuarto." }
+            ]
+          }
+        ]
+      },
+      {
+        unit: "Unidad 5: Rutinas, Transporte y Comida",
+        topics: [
+          {
+            id: "a1_5a",
+            title: "5A-5B. Mi semana y transporte",
+            rule: "Presente simple (I/you/we/they) y preposiciones",
+            theory: "El presente simple describe rutinas. Con 'I, you, we, they' el verbo no cambia. Usamos 'at' para horas, 'on' para días y 'from... to...' para rangos.",
+            formula: "Pregunta: (How/What time) + do + sujeto + verbo base",
+            why: "Decimos 'by bus', 'by train' o 'by car' sin artículo cuando hablamos de medio de transporte en general.",
+            items: [
+              { text: "From Monday to Friday I get up at seven", alt: ["from monday to friday i get up at 7"], ipa: "/frɒm ˈmʌndeɪ tə ˈfraɪdeɪ aɪ ɡet ʌp æt ˈsevn/", es: "from mán-dei tu frái-dei ái guet ap at sé-ven", meaning: "De lunes a viernes me levanto a las siete", tip: "Usamos 'at' para horas exactas ('at seven')." },
+              { text: "I work from nine to five thirty", alt: ["i work from 9 to 5:30"], ipa: "/aɪ wɜːrk frɒm naɪn tə faɪv ˈθɜːrti/", es: "ái uérk from náin tu fáiv zér-ti", meaning: "Trabajo de nueve a cinco y media", tip: "'From ... to ...' marca inicio y fin." },
+              { text: "How do you travel to work", alt: [], ipa: "/haʊ duː juː ˈtrævl tə wɜːrk/", es: "jáu du iu trá-vel tu uérk", meaning: "¿Cómo viajas al trabajo?", tip: "'Travel' suena como 'trá-vel'." },
+              { text: "I drive to work every day", alt: [], ipa: "/aɪ draɪv tə wɜːrk ˈevri deɪ/", es: "ái dráiv tu uérk év-ri déi", meaning: "Manejo al trabajo todos los días", tip: "'Every day' (separado) = todos los días." },
+              { text: "What time do you leave home", alt: [], ipa: "/wɒt taɪm duː juː liːv hoʊm/", es: "uót táim du iu líiv jóum", meaning: "¿A qué hora sales de casa?", tip: "'Leave' es salir/partir ('líiv')." },
+              { text: "I arrive at the office at eight", alt: ["i arrive at the office at 8"], ipa: "/aɪ əˈraɪv æt ði ˈɒfɪs æt eɪt/", es: "ái a-ráiv at di ó-fis at éit", meaning: "Llego a la oficina a las ocho", tip: "'Arrive' lleva acento en 'RIVE' (a-RÁIV)." }
+            ]
+          },
+          {
+            id: "a1_5c",
+            title: "5C-5D. Comida, frecuencia y pedir en un café",
+            rule: "Adverbios de frecuencia y 'would like'",
+            theory: "Palabras como 'always', 'usually', 'often', 'sometimes' y 'never' indican frecuencia y van antes de la mayoría de los verbos. 'Would like' expresa un deseo cortés.",
+            formula: "Sujeto + adverbio de frecuencia + verbo | I'd like + sustantivo",
+            why: "Con 'never' la oración ya es negativa en sentido, por lo que no se escribe 'I don't never'.",
+            items: [
+              { text: "I always drink coffee in the morning", alt: [], ipa: "/aɪ ˈɔːlweɪz drɪŋk ˈkɒfi ɪn ðə ˈmɔːrnɪŋ/", es: "ái ól-ueis drink kó-fi in de mór-ning", meaning: "Siempre tomo café por la mañana", tip: "'Always' va antes del verbo principal ('drink')." },
+              { text: "I usually eat chicken and salad", alt: [], ipa: "/aɪ ˈjuːʒuəli iːt ˈtʃɪkɪn ənd ˈsæləd/", es: "ái iú-shua-li íit chí-ken and sá-lad", meaning: "Usualmente como pollo y ensalada", tip: "'Usually' suena parecido a 'iú-shua-li'." },
+              { text: "How often do you eat fish", alt: [], ipa: "/haʊ ˈɒfn duː juː iːt fɪʃ/", es: "jáu ó-fen du iu íit fish", meaning: "¿Qué tan seguido comes pescado?", tip: "La 't' en 'often' suele ser muda ('ó-fen')." },
+              { text: "I'd like a cheese sandwich please", alt: ["i would like a cheese sandwich please"], ipa: "/aɪd laɪk ə tʃiːz ˈsænwɪtʃ pliːz/", es: "áid láik a chíis sán-uich plíis", meaning: "Quisiera un sándwich de queso por favor", tip: "'I'd like' es una forma educada de pedir." },
+              { text: "Would you like white or brown bread", alt: [], ipa: "/wʊd juː laɪk waɪt ɔːr braʊn bred/", es: "wud iu láik uáit or bráun bred", meaning: "¿Quisiera pan blanco o integral?", tip: "'Would' suena como 'wud', con 'l' muda." },
+              { text: "That's five pounds fifty please", alt: ["that is 5 pounds 50 please"], ipa: "/ðæts faɪv paʊndz ˈfɪfti pliːz/", es: "dats fáiv páunds fíf-ti plíis", meaning: "Son cinco libras con cincuenta por favor", tip: "'Pounds' lleva diptongo 'áu' ('páunds')." }
+            ]
+          }
+        ]
+      },
+      {
+        unit: "Unidad 6: Hábitos y Habilidades (can/can't)",
+        topics: [
+          {
+            id: "a1_6a",
+            title: "6A-6B. Hábitos de otros y tareas del hogar",
+            rule: "Tercera persona singular (-s / -es / -ies) y 'does'",
+            theory: "En presente simple con 'he/she/it', la mayoría de los verbos suman '-s', los que terminan en -ch/-o/-s/-sh/-x suman '-es', y consonante + y cambia a '-ies'. En preguntas y negaciones usamos 'does' / 'doesn't'.",
+            formula: "Afirm: He/She + verbo+s/es | Preg: Does + he/she + verbo base",
+            why: "Cuando aparece 'does' o 'doesn't', el verbo principal vuelve a su forma base ('Does he cook?', no 'Does he cooks?').",
+            items: [
+              { text: "She goes to the gym every week", alt: [], ipa: "/ʃiː ɡoʊz tə ðə dʒɪm ˈevri wiːk/", es: "shi góus tu de yim év-ri uíik", meaning: "Ella va al gimnasio cada semana", tip: "'Gym' suena igual que 'Jim' ('yim')." },
+              { text: "He studies English in the evening", alt: [], ipa: "/hiː ˈstʌdiz ˈɪŋɡlɪʃ ɪn ði ˈiːvnɪŋ/", es: "ji stá-dis íng-lish in di íiv-ning", meaning: "Él estudia inglés por la tarde-noche", tip: "'Studies' cambia '-y' por '-ies' en tercera persona." },
+              { text: "Does he cook dinner", alt: [], ipa: "/dʌz hiː kʊk ˈdɪnər/", es: "das ji kuk dí-ner", meaning: "¿Él cocina la cena?", tip: "Con 'he/she/it' en preguntas usamos 'Does'." },
+              { text: "She washes the dishes after lunch", alt: [], ipa: "/ʃiː ˈwɒʃɪz ðə ˈdɪʃɪz ˈɑːftər lʌntʃ/", es: "shi uó-shis de dí-shis áf-ter lanch", meaning: "Ella lava los platos después del almuerzo", tip: "'Washes' agrega '-es' y suena 'uó-shis'." },
+              { text: "I clean the bathroom at the weekend", alt: [], ipa: "/aɪ kliːn ðə ˈbɑːθruːm æt ðə ˌwiːkˈend/", es: "ái klíin de báz-rum at de uíik-end", meaning: "Limpio el baño el fin de semana", tip: "'Weekend' lleva acento en 'END' (uíik-ÉND)." },
+              { text: "He doesn't take the bus", alt: ["he does not take the bus"], ipa: "/hiː ˈdʌznt teɪk ðə bʌs/", es: "ji dá-sent téik de bas", meaning: "Él no toma el autobús", tip: "En negativo con 'doesn't', el verbo principal queda base ('take')." }
+            ]
+          },
+          {
+            id: "a1_6c",
+            title: "6C-6D. Habilidades (can/can't) y peticiones",
+            rule: "Modal 'can' / 'can't' sin cambios de persona",
+            theory: "'Can' y 'can't' expresan habilidad o permiso. No llevan '-s' en tercera persona y van seguidos directamente por el verbo principal sin 'to'.",
+            formula: "Sujeto + can / can't + verbo base | Can + sujeto + verbo base?",
+            why: "Decimos 'I can speak' y nunca 'I can to speak' porque 'can' es un verbo modal.",
+            items: [
+              { text: "I can speak two languages", alt: ["i can speak 2 languages"], ipa: "/aɪ kæn spiːk tuː ˈlæŋɡwɪdʒɪz/", es: "ái kan spíik tu láng-ui-yis", meaning: "Puedo hablar dos idiomas", tip: "En frases afirmativas 'can' suele sonar suave ('kan')." },
+              { text: "Can you drive a car", alt: [], ipa: "/kæn juː draɪv ə kɑːr/", es: "kan iu dráiv a kar", meaning: "¿Sabes conducir un auto?", tip: "'Can' expresa habilidad o posibilidad." },
+              { text: "Sorry, I can't swim", alt: ["sorry i cannot swim"], ipa: "/ˈsɒri aɪ kɑːnt swɪm/", es: "só-ri, ái kant suím", meaning: "Lo siento, no sé nadar", tip: "'Can't' se marca claro y no lleva 'to' antes del verbo." },
+              { text: "Can I use your computer please", alt: [], ipa: "/kæn aɪ juːz jɔːr kəmˈpjuːtər pliːz/", es: "kan ái iús ior kom-piú-ter plíis", meaning: "¿Puedo usar tu computadora por favor?", tip: "'Can I...?' es muy útil para pedir permiso." },
+              { text: "Yes of course, no problem", alt: [], ipa: "/jes əv kɔːrs noʊ ˈprɒbləm/", es: "ies ov kors, nóu pró-blem", meaning: "Sí por supuesto, no hay problema", tip: "'Of course' suena como 'ov kors'." },
+              { text: "Can you help me with this", alt: [], ipa: "/kæn juː help miː wɪð ðɪs/", es: "kan iu jelp mi uid dis", meaning: "¿Puedes ayudarme con esto?", tip: "'Help me' suele unirse suavemente." }
+            ]
+          }
+        ]
+      },
+      {
+        unit: "Unidad 7: Naturaleza, Fechas y Pasado (was/were)",
+        topics: [
+          {
+            id: "a1_7a",
+            title: "7A-7B. Naturaleza, fechas y was/were",
+            rule: "Pasado de 'be' ('was/were') y fechas ordinales",
+            theory: "En pasado, 'was/wasn't' se usa con I/he/she/it y 'were/weren't' con you/we/they. Las fechas usan números ordinales (first, second, third, eighteenth...).",
+            formula: "I/He/She/It + was/wasn't | You/We/They + were/weren't",
+            why: "Se usa 'was' o 'were' (y no 'did') cuando describimos estados, lugares o características en el pasado sin verbo de acción.",
+            items: [
+              { text: "There are high mountains in the south", alt: [], ipa: "/ðer ɑːr haɪ ˈmaʊntɪnz ɪn ðə saʊθ/", es: "der ar jái máun-tins in de sáuz", meaning: "Hay montañas altas en el sur", tip: "'South' termina con 'th' ('sáuz')." },
+              { text: "My birthday is on the eighteenth of October", alt: ["my birthday is on the 18th of october"], ipa: "/maɪ ˈbɜːrθdeɪ ɪz ɒn ði ˌeɪˈtiːnθ əv ɒkˈtoʊbər/", es: "mái bérz-dei is on di ei-tíinz ov ok-tóu-ber", meaning: "Mi cumpleaños es el 18 de octubre", tip: "Para fechas completas usamos 'on + ordinal + of + mes'." },
+              { text: "Yesterday was a very good day", alt: [], ipa: "/ˈjestərdeɪ wɒz ə ˈveri ɡʊd deɪ/", es: "iés-ter-dei uós a vé-ri gud déi", meaning: "Ayer fue un muy buen día", tip: "'Was' es pasado singular de 'be' ('uós')." },
+              { text: "We were at a restaurant last night", alt: [], ipa: "/wiː wɜːr æt ə ˈrestrɒnt lɑːst naɪt/", es: "uí uér at a rés-tront last náit", meaning: "Estuvimos en un restaurante anoche", tip: "'Were' se usa con we, you y they ('uér')." },
+              { text: "The food wasn't cheap", alt: ["the food was not cheap"], ipa: "/ðə fuːd ˈwɒznt tʃiːp/", es: "de fúud uó-sent chíip", meaning: "La comida no era barata", tip: "'Cheap' significa barato; 'expensive' es caro." },
+              { text: "There weren't any cars", alt: ["there were not any cars"], ipa: "/ðer wɜːrnt ˈeni kɑːrz/", es: "der uérnt é-ni kars", meaning: "No había ningún auto", tip: "'There weren't' es el plural negativo en pasado." }
+            ]
+          },
+          {
+            id: "a1_7c",
+            title: "7C-7D. Preguntas en pasado y boletos",
+            rule: "Preguntas con 'was/were' y vocabulario de viajes",
+            theory: "Para preguntar sobre estados o eventos pasados con 'be', colocamos 'Was' o 'Were' antes del sujeto.",
+            formula: "(How/Where) + was/were + sujeto + ...?",
+            why: "Decimos 'How was your weekend?' con 'was' porque 'your weekend' es singular.",
+            items: [
+              { text: "How was your weekend", alt: [], ipa: "/haʊ wɒz jɔːr ˌwiːkˈend/", es: "jáu uós ior uíik-end", meaning: "¿Cómo estuvo tu fin de semana?", tip: "Ideal para preguntar cómo le fue a alguien." },
+              { text: "Was the meeting difficult", alt: [], ipa: "/wɒz ðə ˈmiːtɪŋ ˈdɪfɪkəlt/", es: "uós de míi-ting dí-fi-kalt", meaning: "¿Estuvo difícil la reunión?", tip: "'Difficult' lleva acento en 'DÍ'." },
+              { text: "What time is the next train", alt: [], ipa: "/wɒt taɪm ɪz ðə nekst treɪn/", es: "uót táim is de nekst tréin", meaning: "¿A qué hora sale el próximo tren?", tip: "'Next' significa próximo o siguiente." },
+              { text: "A return ticket to London please", alt: [], ipa: "/ə rɪˈtɜːrn ˈtɪkɪt tə ˈlʌndən pliːz/", es: "a ri-térn tí-ket tu Lán-don plíis", meaning: "Un boleto de ida y vuelta a Londres por favor", tip: "'Return ticket' = ida y vuelta; 'single ticket' = solo ida." },
+              { text: "Which platform is the fast train", alt: [], ipa: "/wɪtʃ ˈplætfɔːrm ɪz ðə fɑːst treɪn/", es: "uích plát-form is de fast tréin", meaning: "¿Qué andén es el del tren rápido?", tip: "'Platform' lleva acento en 'PLAT'." },
+              { text: "It leaves from platform seven", alt: ["it leaves from platform 7"], ipa: "/ɪt liːvz frɒm ˈplætfɔːrm ˈsevn/", es: "it líivs from plát-form sé-ven", meaning: "Sale del andén siete", tip: "'Leaves' aquí significa sale o parte." }
+            ]
+          }
+        ]
+      },
+      {
+        unit: "Unidad 8: Pasado Simple (Regulares e Irregulares)",
+        topics: [
+          {
+            id: "a1_8a",
+            title: "8A. Cuando era joven (Verbos regulares)",
+            rule: "Pasado simple regular (-ed) y negación con 'didn't'",
+            theory: "Los verbos regulares forman el pasado añadiendo '-ed' (o '-d' si ya acaban en '-e', o '-ied' tras consonante + y). Para negar en pasado usamos 'didn't + verbo base'.",
+            formula: "Afirm: Sujeto + verbo-ed | Neg: Sujeto + didn't + verbo base",
+            why: "En 'I didn't like', 'like' no lleva '-d' porque el pasado ya está marcado por 'didn't'.",
+            items: [
+              { text: "When I was young I lived in a small town", alt: [], ipa: "/wen aɪ wɒz jʌŋ aɪ lɪvd ɪn ə smɔːl taʊn/", es: "uén ái uós iáng ái livd in a smol táun", meaning: "Cuando era joven vivía en un pueblo pequeño", tip: "'Lived' termina con 'd' sonora ('livd')." },
+              { text: "I walked to school every morning", alt: [], ipa: "/aɪ wɔːkt tə skuːl ˈevri ˈmɔːrnɪŋ/", es: "ái uókt tu skul év-ri mór-ning", meaning: "Caminaba a la escuela cada mañana", tip: "'Walked' termina con sonido de 't' ('uókt')." },
+              { text: "I played baseball with my friends", alt: [], ipa: "/aɪ pleɪd ˈbeɪsbɔːl wɪð maɪ frendz/", es: "ái pléid béis-bol uid mái frends", meaning: "Jugaba béisbol con mis amigos", tip: "'Played' suena como 'pléid'." },
+              { text: "We watched TV together at night", alt: [], ipa: "/wiː wɒtʃt ˌtiːˈviː təˈɡeðər æt naɪt/", es: "uí uócht ti-ví tu-gué-der at náit", meaning: "Veíamos televisión juntos por la noche", tip: "'Watched' termina con sonido 't' ('uócht')." },
+              { text: "I didn't like my school", alt: ["i did not like my school"], ipa: "/aɪ ˈdɪdnt laɪk maɪ skuːl/", es: "ái dí-dent láik mái skul", meaning: "No me gustaba mi escuela", tip: "En 'didn't' la segunda 'd' es suave o muda." },
+              { text: "She studied every day", alt: [], ipa: "/ʃiː ˈstʌdid ˈevri deɪ/", es: "shi stá-did év-ri déi", meaning: "Ella estudiaba todos los días", tip: "'Studied' suena como 'stá-did'." }
+            ]
+          },
+          {
+            id: "a1_8b",
+            title: "8B-8C. Verbos irregulares y vacaciones",
+            rule: "Pasado irregular y preguntas con 'did'",
+            theory: "Los verbos irregulares cambian su forma en pasado afirmativo (go -> went, buy -> bought, break -> broke). En preguntas con 'did', el verbo vuelve a su forma base.",
+            formula: "Afirm: Sujeto + pasado irregular | Preg: Did + sujeto + verbo base?",
+            why: "No existe una regla única para verbos irregulares como 'went' o 'bought'; conviene aprenderlos en parejas (infinitivo -> pasado).",
+            items: [
+              { text: "I got up late and missed the bus", alt: [], ipa: "/aɪ ɡɒt ʌp leɪt ənd mɪst ðə bʌs/", es: "ái got ap léit and mist de bas", meaning: "Me levanté tarde y perdí el autobús", tip: "'Got up' es el pasado de 'get up'." },
+              { text: "My computer broke yesterday", alt: [], ipa: "/maɪ kəmˈpjuːtər broʊk ˈjestərdeɪ/", es: "mái kom-piú-ter bróuk iés-ter-dei", meaning: "Mi computadora se rompió ayer", tip: "'Broke' es el pasado irregular de 'break' ('bróuk')." },
+              { text: "We went to the mountains last month", alt: [], ipa: "/wiː went tə ðə ˈmaʊntɪnz lɑːst mʌnθ/", es: "uí uént tu de máun-tins last manz", meaning: "Fuimos a las montañas el mes pasado", tip: "'Went' es el pasado de 'go' ('uént')." },
+              { text: "Did you have a good holiday", alt: [], ipa: "/dɪd juː hæv ə ɡʊd ˈhɒlədeɪ/", es: "did iu jav a gud jó-li-dei", meaning: "¿Tuviste unas buenas vacaciones?", tip: "En preguntas en pasado con 'Did', el verbo vuelve a su forma base ('have')." },
+              { text: "Where did you stay", alt: [], ipa: "/wer dɪd juː steɪ/", es: "uér did iu stéi", meaning: "¿Dónde te hospedaste?", tip: "'Stay' significa quedarse u hospedarse." },
+              { text: "I bought a new phone", alt: [], ipa: "/aɪ bɔːt ə njuː foʊn/", es: "ái bot a niú fóun", meaning: "Compré un teléfono nuevo", tip: "'Bought' es el pasado de 'buy' y suena como 'bot'." }
+            ]
+          }
+        ]
+      },
+      {
+        unit: "Unidad 9: Fotos, Pasatiempos y Estudio",
+        topics: [
+          {
+            id: "a1_9a",
+            title: "9A-9B. Preposiciones y gustos (+ -ing)",
+            rule: "Pronombres objeto y verbos de gusto + -ing",
+            theory: "Los pronombres objeto (me, you, him, her, it, us, them) van después de verbos o preposiciones. Tras 'love, like, enjoy, hate' se suele usar verbo con '-ing'.",
+            formula: "Verbo/Preposición + pronombre objeto | love/like/enjoy/hate + verbo-ing",
+            why: "Decimos 'talk to them' (y no 'talk to they') porque 'them' funciona como objeto de la preposición 'to'.",
+            items: [
+              { text: "The cup is in front of the cake", alt: [], ipa: "/ðə kʌp ɪz ɪn frʌnt əv ðə keɪk/", es: "de kap is in frant ov de kéik", meaning: "La taza está delante del pastel", tip: "'In front of' significa delante de." },
+              { text: "I often talk to them at the weekend", alt: [], ipa: "/aɪ ˈɒfn tɔːk tə ðem æt ðə ˌwiːkˈend/", es: "ái ó-fen tok tu dem at de uíik-end", meaning: "A menudo hablo con ellos el fin de semana", tip: "'Them' es pronombre objeto ('a ellos/ellas')." },
+              { text: "I love reading books", alt: [], ipa: "/aɪ lʌv ˈriːdɪŋ bʊks/", es: "ái lav ríi-ding buks", meaning: "Me encanta leer libros", tip: "Tras 'love/like/enjoy/hate' solemos usar verbo con '-ing'." },
+              { text: "I enjoy doing exercise", alt: [], ipa: "/aɪ ɪnˈdʒɔɪ ˈduːɪŋ ˈeksərsaɪz/", es: "ái en-yói dú-ing ék-ser-sais", meaning: "Disfruto hacer ejercicio", tip: "'Enjoy' lleva acento en 'JOY' (en-YÓI)." },
+              { text: "I hate cleaning the bathroom", alt: [], ipa: "/aɪ heɪt ˈkliːnɪŋ ðə ˈbɑːθruːm/", es: "ái jéit klíi-ning de báz-rum", meaning: "Odio limpiar el baño", tip: "'Hate' suena como 'jéit'." },
+              { text: "What do you like doing in your free time", alt: [], ipa: "/wɒt duː juː laɪk ˈduːɪŋ ɪn jɔːr friː taɪm/", es: "uót du iu láik dú-ing in ior fri táim", meaning: "¿Qué te gusta hacer en tu tiempo libre?", tip: "'Free time' = tiempo libre." }
+            ]
+          },
+          {
+            id: "a1_9c",
+            title: "9C-9D. Hábitos de estudio (why/because) y sugerencias",
+            rule: "Preguntar con 'why', responder con 'because' y 'shall we'",
+            theory: "'Why' introduce una pregunta por el motivo y 'because' introduce la causa o razón. Para hacer sugerencias amigables se usa 'Shall we + verbo base?'.",
+            formula: "Why + auxiliar + sujeto + verbo? | ... because + sujeto + verbo",
+            why: "'Why' siempre abre la pregunta de motivo, mientras que 'because' conecta la idea principal con su explicación.",
+            items: [
+              { text: "Why do you study English", alt: [], ipa: "/waɪ duː juː ˈstʌdi ˈɪŋɡlɪʃ/", es: "uái du iu stá-di íng-lish", meaning: "¿Por qué estudias inglés?", tip: "'Why' pregunta el motivo; 'because' da la razón." },
+              { text: "Because I need it for my job", alt: [], ipa: "/bɪˈkɒz aɪ niːd ɪt fɔːr maɪ dʒɒb/", es: "bi-kós ái níid it for mái yob", meaning: "Porque lo necesito para mi trabajo", tip: "'Because' lleva acento en 'CAUSE' (bi-KÓS)." },
+              { text: "I always make notes in class", alt: [], ipa: "/aɪ ˈɔːlweɪz meɪk noʊts ɪn klɑːs/", es: "ái ól-ueis méik nóuts in klas", meaning: "Siempre tomo apuntes en clase", tip: "'Make notes' = tomar notas o apuntes." },
+              { text: "I can't remember that word", alt: ["i cannot remember that word"], ipa: "/aɪ kɑːnt rɪˈmembər ðæt wɜːrd/", es: "ái kant ri-mém-ber dat uérd", meaning: "No puedo recordar esa palabra", tip: "'Remember' lleva acento en 'MEM'." },
+              { text: "Shall we go to the cinema", alt: [], ipa: "/ʃæl wiː ɡoʊ tə ðə ˈsɪnəmə/", es: "shal uí góu tu de sí-ne-ma", meaning: "¿Vamos al cine?", tip: "'Shall we...?' es una forma natural de proponer un plan." },
+              { text: "That's a great idea", alt: ["that is a great idea"], ipa: "/ðæts ə ɡreɪt aɪˈdɪə/", es: "dats a gréit ai-dí-a", meaning: "Esa es una gran idea", tip: "'Idea' suena como 'ai-DÍ-a'." }
+            ]
+          }
+        ]
+      },
+      {
+        unit: "Unidad 10: Metas, Planes e Invitaciones",
+        topics: [
+          {
+            id: "a1_10a",
+            title: "10A-10B. Deseos (would like) y planes (going to)",
+            rule: "'Would like to + verbo' y 'be going to + verbo'",
+            theory: "'Would like to + verbo' ('d like to) expresa deseos o metas. 'Be going to + verbo' expresa planes o intenciones ya decididas para el futuro.",
+            formula: "Deseo: Sujeto + 'd like to + verbo | Plan: Sujeto + be + going to + verbo",
+            why: "Tras 'would like' o 'going to' el verbo de acción va en infinitivo ('to start', 'to have'), no conjugado.",
+            items: [
+              { text: "I'd like to start a small business", alt: ["i would like to start a small business"], ipa: "/aɪd laɪk tə stɑːrt ə smɔːl ˈbɪznəs/", es: "áid láik tu start a smol bís-nes", meaning: "Me gustaría empezar un pequeño negocio", tip: "'Business' se pronuncia corto: 'BÍS-nes'." },
+              { text: "I'd love to travel around the world", alt: ["i would love to travel around the world"], ipa: "/aɪd lʌv tə ˈtrævl əˈraʊnd ðə wɜːrld/", es: "áid lav tu trá-vel a-ráund de uérld", meaning: "Me encantaría viajar por el mundo", tip: "'Around' lleva acento en 'ROUND' (a-RÁUND)." },
+              { text: "Would you like to change your job", alt: [], ipa: "/wʊd juː laɪk tə tʃeɪndʒ jɔːr dʒɒb/", es: "wud iu láik tu chéinch ior yob", meaning: "¿Te gustaría cambiar de trabajo?", tip: "'Change' tiene sonido 'ch' al inicio y 'y' al final ('chéinch')." },
+              { text: "We're going to have a party next week", alt: ["we are going to have a party next week"], ipa: "/wɪər ˈɡoʊɪŋ tə hæv ə ˈpɑːrti nekst wiːk/", es: "uíar góu-ing tu jav a pár-ti nekst uíik", meaning: "Vamos a hacer una fiesta la próxima semana", tip: "'Going to + verbo' expresa planes futuros." },
+              { text: "I'm going to buy drinks and snacks", alt: ["i am going to buy drinks and snacks"], ipa: "/aɪm ˈɡoʊɪŋ tə baɪ drɪŋks ənd snæks/", es: "áim góu-ing tu bái drinks and snaks", meaning: "Voy a comprar bebidas y bocadillos", tip: "'Snacks' empieza con 'sn' ('snaks')." },
+              { text: "He isn't going to come", alt: ["he is not going to come"], ipa: "/hiː ˈɪznt ˈɡoʊɪŋ tə kʌm/", es: "ji í-sent góu-ing tu kam", meaning: "Él no va a venir", tip: "'Come' aquí significa venir." }
+            ]
+          },
+          {
+            id: "a1_10c",
+            title: "10C-10D. Estaciones, preguntas e invitaciones",
+            rule: "Preguntas con 'going to' y preposiciones de tiempo",
+            theory: "En preguntas con 'going to', el verbo 'be' (am/is/are) pasa delante del sujeto. Usamos 'in' con meses y estaciones ('in summer'), y 'on' con días o fechas.",
+            formula: "(Wh-) + am/is/are + sujeto + going to + verbo?",
+            why: "En 'What are you going to do...', 'are' precede a 'you' porque es pregunta.",
+            items: [
+              { text: "What are you going to do in the summer", alt: [], ipa: "/wɒt ɑːr juː ˈɡoʊɪŋ tə duː ɪn ðə ˈsʌmər/", es: "uót ar iu góu-ing tu du in de sá-mer", meaning: "¿Qué vas a hacer en el verano?", tip: "Usamos 'in' con estaciones y meses ('in summer')." },
+              { text: "Next year I'm going to speak better English", alt: ["next year i am going to speak better english"], ipa: "/nekst jɪər aɪm ˈɡoʊɪŋ tə spiːk ˈbetər ˈɪŋɡlɪʃ/", es: "nekst íar áim góu-ing tu spíik bé-ter íng-lish", meaning: "El próximo año voy a hablar mejor inglés", tip: "'Better' es el comparativo de 'good'." },
+              { text: "How long are you going to stay", alt: [], ipa: "/haʊ lɒŋ ɑːr juː ˈɡoʊɪŋ tə steɪ/", es: "jáu long ar iu góu-ing tu stéi", meaning: "¿Cuánto tiempo te vas a quedar?", tip: "'How long' pregunta duración en el tiempo." },
+              { text: "Would you like to have dinner with us", alt: [], ipa: "/wʊd juː laɪk tə hæv ˈdɪnər wɪð ʌs/", es: "wud iu láik tu jav dí-ner uid as", meaning: "¿Te gustaría cenar con nosotros?", tip: "'With us' significa con nosotros." },
+              { text: "I'd love to, thanks", alt: ["i would love to thanks"], ipa: "/aɪd lʌv tuː θæŋks/", es: "áid lav tu, zanks", meaning: "Me encantaría, gracias", tip: "Una respuesta cálida y natural para aceptar una invitación." },
+              { text: "Sorry I can't because I work on Saturdays", alt: ["sorry i cannot because i work on saturdays"], ipa: "/ˈsɒri aɪ kɑːnt bɪˈkɒz aɪ wɜːrk ɒn ˈsætərdeɪz/", es: "só-ri ái kant bi-kós ái uérk on sá-ter-deis", meaning: "Perdón no puedo porque trabajo los sábados", tip: "Días en plural ('Saturdays') indican hábito de todos los sábados." }
+            ]
+          }
+        ]
+      }
+    ],
+    A2: [
+      {
+        unit: "Módulo A2: Comparaciones y Experiencias",
+        topics: [
+          {
+            id: "a2_1",
+            title: "1. Comparativos y Superlativos",
+            rule: "Comparación con '-er / more ... than' y superlativos",
+            theory: "Adjetivos cortos suman '-er' para comparar ('faster than') y 'the ... -est' para superlativo. Adjetivos largos (2+ sílabas como 'expensive') usan 'more ... than' y 'the most ...'.",
+            formula: "Comp: adj+-er / more + adj + than | Sup: the + adj+-est / most + adj",
+            why: "'Good' es irregular en comparación: no se dice 'gooder', sino 'better' (comparativo) y 'the best' (superlativo).",
+            items: [
+              { text: "This car is faster than the old one", alt: [], ipa: "/ðɪs kɑːr ɪz ˈfɑːstər ðæn ði oʊld wʌn/", es: "dis kar is fás-ter dan di óuld uán", meaning: "Este auto es más rápido que el viejo", tip: "Para comparar dos cosas usamos 'than' ('que')." },
+              { text: "Living in the city is more expensive", alt: [], ipa: "/ˈlɪvɪŋ ɪn ðə ˈsɪti ɪz mɔːr ɪkˈspensɪv/", es: "lí-ving in de sí-ti is mor iks-pén-siv", meaning: "Vivir en la ciudad es más caro", tip: "Adjetivos largos usan 'more + adjetivo' ('more expensive')." },
+              { text: "This is the best restaurant in town", alt: [], ipa: "/ðɪs ɪz ðə best ˈrestrɒnt ɪn taʊn/", es: "dis is de best rés-tront in táun", meaning: "Este es el mejor restaurante del pueblo", tip: "'Best' es el superlativo irregular de 'good'." },
+              { text: "Today is colder than yesterday", alt: [], ipa: "/təˈdeɪ ɪz ˈkoʊldər ðæn ˈjestərdeɪ/", es: "tu-déi is kóul-der dan iés-ter-dei", meaning: "Hoy hace más frío que ayer", tip: "'Cold' -> 'colder' agrega '-er' al final." },
+              { text: "Steel is heavier than aluminium", alt: ["steel is heavier than aluminum"], ipa: "/stiːl ɪz ˈheviər ðæn ˌæljəˈmɪniəm/", es: "stíil is jé-vier dan a-lú-mi-nam", meaning: "El acero es más pesado que el aluminio", tip: "'Heavy' cambia '-y' por '-ier' ('heavier')." },
+              { text: "Which option is better for the project", alt: [], ipa: "/wɪtʃ ˈɒpʃn ɪz ˈbetər fɔːr ðə ˈprɒdʒekt/", es: "uích óp-shon is bé-ter for de pró-yekt", meaning: "¿Qué opción es mejor para el proyecto?", tip: "'Better' es el comparativo de 'good'." }
+            ]
+          },
+          {
+            id: "a2_2",
+            title: "2. Presente Perfecto (Experiencias)",
+            rule: "Presente perfecto: have/has + participio",
+            theory: "Conecta el pasado con el presente para hablar de experiencias de vida o acciones recientes con resultado actual. Se forma con 'have/has' + participio pasado.",
+            formula: "Sujeto + have/has ('ve/'s) + participio | Neg: haven't/hasn't + participio",
+            why: "Usamos 'already' en afirmativas ('ya') y 'yet' al final de negativas o preguntas ('todavía / ya').",
+            items: [
+              { text: "Have you ever been to London", alt: [], ipa: "/hæv juː ˈevər biːn tə ˈlʌndən/", es: "jav iu é-ver bíin tu Lán-don", meaning: "¿Alguna vez has estado en Londres?", tip: "'Ever' en preguntas significa 'alguna vez'." },
+              { text: "I've already finished the report", alt: ["i have already finished the report"], ipa: "/aɪv ɔːlˈredi ˈfɪnɪʃt ðə rɪˈpɔːrt/", es: "áiv ol-ré-di fí-nisht de ri-pórt", meaning: "Ya he terminado el informe", tip: "'Already' significa 'ya' en frases afirmativas." },
+              { text: "She hasn't arrived yet", alt: ["she has not arrived yet"], ipa: "/ʃiː ˈhæznt əˈraɪvd jet/", es: "shi já-sent a-ráivd iét", meaning: "Ella todavía no ha llegado", tip: "'Yet' al final de una negativa significa 'todavía'." },
+              { text: "We've worked together for three years", alt: ["we have worked together for 3 years"], ipa: "/wiːv wɜːrkt təˈɡeðər fɔːr θriː jɪərz/", es: "uív uérkt tu-gué-der for zrii íars", meaning: "Hemos trabajado juntos durante tres años", tip: "'For' indica duración ('three years')." },
+              { text: "I've never tried Japanese food", alt: ["i have never tried japanese food"], ipa: "/aɪv ˈnevər traɪd ˌdʒæpəˈniːz fuːd/", es: "áiv né-ver tráid ya-pa-níis fúud", meaning: "Nunca he probado la comida japonesa", tip: "'Never' ya da sentido negativo; no necesita 'not'." },
+              { text: "Have you checked the pressure gauge", alt: [], ipa: "/hæv juː tʃekt ðə ˈpreʃər ɡeɪdʒ/", es: "jav iu chekt de pré-sher guéich", meaning: "¿Has revisado el manómetro?", tip: "'Gauge' (manómetro/medidor) suena como 'guéich'." }
+            ]
+          },
+          {
+            id: "a2_3",
+            title: "3. Obligación y Consejos (have to / should)",
+            rule: "Diferencia entre 'should' (consejo) y 'have to / must' (obligación)",
+            theory: "'Should / shouldn't' da recomendaciones o sugerencias. 'Have to' expresa necesidad u obligación externa, mientras que 'don't have to' significa que no es obligatorio.",
+            formula: "Consejo: Sujeto + should/shouldn't + verbo | Obligación: Sujeto + have to + verbo",
+            why: "'You don't have to pay' NO significa 'prohibido pagar', sino 'no tienes obligación de pagar'.",
+            items: [
+              { text: "You should wear safety glasses", alt: [], ipa: "/juː ʃʊd wer ˈseɪfti ˈɡlɑːsɪz/", es: "iu shud uér séif-ti glá-sis", meaning: "Deberías usar gafas de seguridad", tip: "'Should' se usa para recomendaciones; la 'l' no suena." },
+              { text: "I have to wake up early tomorrow", alt: [], ipa: "/aɪ hæv tə weɪk ʌp ˈɜːrli təˈmɒroʊ/", es: "ái jav tu uéik ap ér-li tu-mó-rou", meaning: "Tengo que despertarme temprano mañana", tip: "'Have to + verbo' expresa obligación o necesidad." },
+              { text: "You don't have to pay today", alt: ["you do not have to pay today"], ipa: "/juː doʊnt hæv tə peɪ təˈdeɪ/", es: "iu dóunt jav tu péi tu-déi", meaning: "No tienes que pagar hoy", tip: "'Don't have to' significa 'no es necesario'." },
+              { text: "We must check all the connections", alt: [], ipa: "/wiː mʌst tʃek ɔːl ðə kəˈnekʃnz/", es: "uí mast chek ol de ko-nék-shons", meaning: "Debemos revisar todas las conexiones", tip: "'Must' indica una obligación firme o regla." },
+              { text: "You shouldn't work so late", alt: ["you should not work so late"], ipa: "/juː ˈʃʊdnt wɜːrk soʊ leɪt/", es: "iu shú-dent uérk sóu léit", meaning: "No deberías trabajar tan tarde", tip: "'Shouldn't' es la forma negativa de 'should'." },
+              { text: "What should we do next", alt: [], ipa: "/wɒt ʃʊd wiː duː nekst/", es: "uót shud uí du nekst", meaning: "¿Qué deberíamos hacer después?", tip: "Útil para pedir orientación en equipo." }
+            ]
+          }
+        ]
+      }
+    ],
+    DAILY: [
+      {
+        unit: "Frases Típicas Diarias (A1 - A2)",
+        topics: [
+          {
+            id: "daily_phrases_a1",
+            title: "☀️ Frases del día (Nivel A1)",
+            rule: "Expresiones cotidianas y tiempo presente/futuro",
+            theory: "Son frases cortas de alta frecuencia que combinan presente simple, 'going to' y expresiones fijas como 'on my way' o 'before'.",
+            formula: "Expresión fija + complemento | before/when + cláusula",
+            why: "Aprender bloques ya armados como 'I'm on my way' te ayuda a sonar más natural sin traducir palabra por palabra.",
+            items: [
+              { text: "Good morning, how did you sleep", alt: [], ipa: "/ɡʊd ˈmɔːrnɪŋ haʊ dɪd juː sliːp/", es: "gud mór-ning, jáu did iu slíip", meaning: "Buenos días, ¿cómo dormiste?", tip: "Una pregunta natural para arrancar la mañana." },
+              { text: "I need a cup of coffee first", alt: [], ipa: "/aɪ niːd ə kʌp əv ˈkɒfi fɜːrst/", es: "ái níid a kap ov kó-fi ferst", meaning: "Primero necesito una taza de café", tip: "'Cup of' en habla rápida suele sonar como 'ká-pa'." },
+              { text: "Let's go before it gets late", alt: ["let us go before it gets late"], ipa: "/lets ɡoʊ bɪˈfɔːr ɪt ɡets leɪt/", es: "lets góu bi-fór it guets léit", meaning: "Vámonos antes de que se haga tarde", tip: "'Before' significa antes de." },
+              { text: "I'm on my way now", alt: ["i am on my way now"], ipa: "/aɪm ɒn maɪ weɪ naʊ/", es: "áim on mái uéi náu", meaning: "Ya voy en camino", tip: "'On my way' es la expresión estándar para 'voy en camino'." },
+              { text: "What's for lunch today", alt: ["what is for lunch today"], ipa: "/wɒts fɔːr lʌntʃ təˈdeɪ/", es: "uóts for lanch tu-déi", meaning: "¿Qué hay de almuerzo hoy?", tip: "Se usa mucho en casa o en el trabajo al mediodía." },
+              { text: "I'm tired, I'm going to bed", alt: ["i am tired i am going to bed"], ipa: "/aɪm ˈtaɪərd aɪm ˈɡoʊɪŋ tə bed/", es: "áim táierd, áim góu-ing tu bed", meaning: "Estoy cansado, me voy a dormir", tip: "'Tired' suena parecido a 'táierd'." }
+            ]
+          },
+          {
+            id: "daily_phrases_a2",
+            title: "💬 Frases del día (Nivel A2)",
+            rule: "Phrasal verbs cotidianos y futuro con 'will' / 'when'",
+            theory: "En nivel A2 aparecen 'phrasal verbs' comunes como 'catch up' (ponerse al día) y estructuras de futuro ('I'll text you...') combinadas con 'when'.",
+            formula: "I'll ('ll) + verbo base + when + sujeto + presente simple",
+            why: "Después de 'when' refiriéndonos al futuro, en inglés se usa presente simple ('when I get home'), no futuro con 'will'.",
+            items: [
+              { text: "Can we catch up later today", alt: [], ipa: "/kæn wiː kætʃ ʌp ˈleɪtər təˈdeɪ/", es: "kan uí kach ap léi-ter tu-déi", meaning: "¿Podemos ponernos al día más tarde hoy?", tip: "'Catch up' significa ponerse al día o charlar para actualizarse." },
+              { text: "It's been a really busy week", alt: ["it has been a really busy week"], ipa: "/ɪts biːn ə ˈrɪəli ˈbɪzi wiːk/", es: "its bíin a rí-li bí-si uíik", meaning: "Ha sido una semana realmente ocupada", tip: "'Busy' suena como 'bí-si' (no 'bú-si')." },
+              { text: "I forgot to charge my phone", alt: [], ipa: "/aɪ fərˈɡɒt tə tʃɑːrdʒ maɪ foʊn/", es: "ái for-gót tu charch mái fóun", meaning: "Olvidé cargar mi teléfono", tip: "'Charge' aquí significa cargar batería ('charch')." },
+              { text: "Do you want to grab something to eat", alt: [], ipa: "/duː juː wɒnt tə ɡræb ˈsʌmθɪŋ tə iːt/", es: "du iu uónt tu grab sám-zing tu íit", meaning: "¿Quieres ir a comer algo?", tip: "'Grab something to eat' es una forma casual de decir 'comer algo rápido'." },
+              { text: "I'll text you when I get home", alt: ["i will text you when i get home"], ipa: "/aɪl tekst juː wen aɪ ɡet hoʊm/", es: "áil tekst iu uén ái guet jóum", meaning: "Te escribo cuando llegue a casa", tip: "Tras 'when' en futuro usamos presente ('when I get home')." },
+              { text: "Make sure you lock the door", alt: [], ipa: "/meɪk ʃʊər juː lɒk ðə dɔːr/", es: "méik shur iu lok de dor", meaning: "Asegúrate de cerrar la puerta con llave", tip: "'Make sure' = asegúrate de." }
+            ]
+          }
+        ]
+      },
+      {
+        unit: "Historias Cotidianas (Qué hace una persona en el día)",
+        topics: [
+          {
+            id: "story_routine_a1",
+            title: "📖 Historia A1: Un día normal de Lucas",
+            rule: "Secuencia cronológica en presente simple (3ra persona)",
+            theory: "Para narrar una rutina diaria de otra persona ('Lucas' = he) usamos presente simple con '-s/-es' y conectores de secuencia como 'First', 'Then' y 'At night'.",
+            formula: "Conector de secuencia + He + verbo+s/es + lugar/hora",
+            why: "Como hablamos de lo que Lucas hace habitualmente ('he'), los verbos toman '-s' o '-es' ('wakes', 'makes', 'goes', 'watches').",
+            items: [
+              { text: "Lucas wakes up at seven in the morning", alt: ["lucas wakes up at 7 in the morning"], ipa: "/ˈluːkəs weɪks ʌp æt ˈsevn ɪn ðə ˈmɔːrnɪŋ/", es: "Lú-kas uéiks ap at sé-ven in de mór-ning", meaning: "Lucas se despierta a las siete de la mañana", tip: "En tercera persona singular el verbo lleva '-s' ('wakes up')." },
+              { text: "First he has a shower and gets dressed", alt: [], ipa: "/fɜːrst hiː hæz ə ˈʃaʊər ənd ɡets drest/", es: "ferst ji jas a sháu-er and guets drest", meaning: "Primero se ducha y se viste", tip: "'Gets dressed' significa vestirse." },
+              { text: "Then he makes breakfast and drinks tea", alt: [], ipa: "/ðen hiː meɪks ˈbrekfəst ənd drɪŋks tiː/", es: "den ji méiks brék-fast and drinks tíi", meaning: "Luego prepara el desayuno y toma té", tip: "'Breakfast' se pronuncia 'BRÉK-fast'." },
+              { text: "He goes to work by bus at eight thirty", alt: ["he goes to work by bus at 8:30"], ipa: "/hiː ɡoʊz tə wɜːrk baɪ bʌs æt eɪt ˈθɜːrti/", es: "ji góus tu uérk bái bas at éit zér-ti", meaning: "Va a trabajar en autobús a las ocho y media", tip: "'Go' en tercera persona es 'goes' ('góus')." },
+              { text: "In the afternoon he has lunch at his desk", alt: [], ipa: "/ɪn ði ˈɑːftərnuːn hiː hæz lʌntʃ æt hɪz desk/", es: "in di áf-ter-nún ji jas lanch at jis desk", meaning: "Por la tarde almuerza en su escritorio", tip: "'Have lunch' = almorzar." },
+              { text: "At night he watches TV and goes to sleep", alt: [], ipa: "/æt naɪt hiː ˈwɒtʃɪz ˌtiːˈviː ənd ɡoʊz tə sliːp/", es: "at náit ji uó-chis ti-ví and góus tu slíip", meaning: "Por la noche ve televisión y se va a dormir", tip: "'Watches' añade '-es' porque 'watch' termina en '-ch'." }
+            ]
+          },
+          {
+            id: "story_dayoff_a2",
+            title: "📖 Historia A2: El día libre de Sofía",
+            rule: "Narración en pasado simple (regulares e irregulares)",
+            theory: "Para contar un día pasado ya terminado usamos pasado simple: verbos regulares con '-ed' ('checked', 'studied', 'planned') e irregulares ('woke up', 'went', 'met').",
+            formula: "Día/Momento + She + verbo en pasado + complemento",
+            why: "La historia ocurre el sábado pasado, por eso todo el relato se mantiene en tiempo pasado de forma coherente.",
+            items: [
+              { text: "On Saturday Sofia didn't set her alarm", alt: [], ipa: "/ɒn ˈsætərdeɪ soʊˈfiːə ˈdɪdnt set hɜːr əˈlɑːrm/", es: "on sá-ter-dei So-fí-a dí-dent set jer a-larm", meaning: "El sábado Sofía no puso su alarma", tip: "'Set an alarm' = poner una alarma." },
+              { text: "She woke up slowly and checked her messages", alt: [], ipa: "/ʃiː woʊk ʌp ˈsloʊli ənd tʃekt hɜːr ˈmesɪdʒɪz/", es: "shi uóuk ap slóu-li and chekt jer mé-si-yis", meaning: "Se despertó despacio y revisó sus mensajes", tip: "'Woke up' es el pasado de 'wake up'." },
+              { text: "After breakfast she went to the market for fruit", alt: [], ipa: "/ˈɑːftər ˈbrekfəst ʃiː went tə ðə ˈmɑːrkɪt fɔːr fruːt/", es: "áf-ter brék-fast shi uént tu de már-ket for frúut", meaning: "Después del desayuno fue al mercado por fruta", tip: "'Fruit' se pronuncia como una sola sílaba ('frúut')." },
+              { text: "In the afternoon she studied English for an hour", alt: [], ipa: "/ɪn ði ˈɑːftərnuːn ʃiː ˈstʌdid ˈɪŋɡlɪʃ fɔːr ən ˈaʊər/", es: "in di áf-ter-nún shi stá-did íng-lish for an áu-er", meaning: "Por la tarde estudió inglés durante una hora", tip: "En 'hour' la 'h' es muda; suena como 'áu-er'." },
+              { text: "Later she met some friends for dinner", alt: [], ipa: "/ˈleɪtər ʃiː met səm frendz fɔːr ˈdɪnər/", es: "léi-ter shi met sam frends for dí-ner", meaning: "Más tarde se reunió con unos amigos para cenar", tip: "'Met' es el pasado de 'meet' (conocer o encontrarse)." },
+              { text: "She went home happy and planned her next week", alt: [], ipa: "/ʃiː went hoʊm ˈhæpi ənd plænd hɜːr nekst wiːk/", es: "shi uént jóum já-pi and pland jer nekst uíik", meaning: "Volvió a casa contenta y planificó su próxima semana", tip: "'Planned' duplica la 'n' antes de '-ed'." }
+            ]
+          },
+          {
+            id: "story_gym_errands_a2",
+            title: "📖 Historia A2: Entrenamiento y compras de Martín",
+            rule: "Pasado simple con actividades físicas y compras",
+            theory: "Combina verbos de acción en pasado ('went', 'did', 'rode', 'took', 'bought', 'cooked', 'relaxed') con expresiones de tiempo y propósito ('for + sustantivo').",
+            formula: "Sujeto + verbo en pasado + objeto + for + propósito",
+            why: "Usamos 'for' antes de 'dinner', 'breakfast' o 'fruit' cuando indicamos el motivo o la comida de destino.",
+            items: [
+              { text: "Martin went to the gym before work", alt: [], ipa: "/ˈmɑːrtɪn went tə ðə dʒɪm bɪˈfɔːr wɜːrk/", es: "Már-tin uént tu de yim bi-fór uérk", meaning: "Martín fue al gimnasio antes del trabajo", tip: "Entrenar temprano ayuda a empezar el día con energía." },
+              { text: "He did strength training and rode his bike", alt: [], ipa: "/hiː dɪd streŋθ ˈtreɪnɪŋ ənd roʊd hɪz baɪk/", es: "ji did strengz tréi-ning and róud jis báik", meaning: "Hizo entrenamiento de fuerza y anduvo en bicicleta", tip: "'Rode' es el pasado irregular de 'ride'." },
+              { text: "After that he took a quick shower", alt: [], ipa: "/ˈɑːftər ðæt hiː tʊk ə kwɪk ˈʃaʊər/", es: "áf-ter dat ji tuk a kuik sháu-er", meaning: "Después de eso tomó una ducha rápida", tip: "'Took' es el pasado de 'take' ('tuk')." },
+              { text: "On his way home he bought chicken and vegetables", alt: [], ipa: "/ɒn hɪz weɪ hoʊm hiː bɔːt ˈtʃɪkɪn ənd ˈvedʒtəbəlz/", es: "on jis uéi jóum ji bot chí-ken and véch-ta-bols", meaning: "De camino a casa compró pollo y vegetales", tip: "'Vegetables' suele sonar en 3 sílabas: 'VÉCH-ta-bols'." },
+              { text: "He cooked a healthy meal in the evening", alt: [], ipa: "/hiː kʊkt ə ˈhelθi miːl ɪn ði ˈiːvnɪŋ/", es: "ji kukt a jél-zi míil in di íiv-ning", meaning: "Cocinó una comida saludable por la noche", tip: "'Meal' significa comida (como desayuno, almuerzo o cena)." },
+              { text: "Then he relaxed and got ready for tomorrow", alt: [], ipa: "/ðen hiː rɪˈlækst ənd ɡɒt ˈredi fɔːr təˈmɒroʊ/", es: "den ji ri-lákst and got ré-di for tu-mó-rou", meaning: "Luego se relajó y se preparó para mañana", tip: "'Get ready' significa prepararse o alistarse." }
+            ]
+          },
+          {
+            id: "story_weekend_trip_a2",
+            title: "📖 Historia A2: Escapada de fin de semana",
+            rule: "Pasado simple en viajes, clima y lugares",
+            theory: "Al relatar un viaje usamos pasado simple para acciones ('packed', 'drove', 'arrived', 'visited') y 'was/were' para describir cómo estaba el clima o el lugar.",
+            formula: "Acción: Sujeto + pasado | Descripción: Lugar/Clima + was/were + adjetivo",
+            why: "Para el clima en inglés se usa sujeto 'it' ('It was sunny and warm'), nunca se omite el sujeto como en 'Hacía sol'.",
+            items: [
+              { text: "On Friday afternoon we packed our bags", alt: [], ipa: "/ɒn ˈfraɪdeɪ ˌɑːftərˈnuːn wiː pækt ˈaʊər bæɡz/", es: "on frái-dei áf-ter-nún uí pakt áu-er bags", meaning: "El viernes por la tarde preparamos nuestras maletas", tip: "'Pack a bag' significa hacer la maleta o preparar el bolso." },
+              { text: "We drove south along the road", alt: [], ipa: "/wiː droʊv saʊθ əˈlɒŋ ðə roʊd/", es: "uí dróuv sáuz a-lóng de róud", meaning: "Condujimos hacia el sur por la ruta", tip: "'Drove' es el pasado irregular de 'drive' ('dróuv')." },
+              { text: "We arrived at the cabin before dark", alt: [], ipa: "/wiː əˈraɪvd æt ðə ˈkæbɪn bɪˈfɔːr dɑːrk/", es: "uí a-ráivd at de ká-bin bi-fór dark", meaning: "Llegamos a la cabaña antes de que oscureciera", tip: "Usamos 'at' para lugares específicos como 'at the cabin' o 'at the hotel'." },
+              { text: "The weather was cool and the air was fresh", alt: [], ipa: "/ðə ˈweðər wɒz kuːl ənd ði er wɒz freʃ/", es: "de ué-der uós kúul and di ér uós fresh", meaning: "El clima estaba fresco y el aire era puro", tip: "'Weather' (clima) suena como 'ué-der'." },
+              { text: "We walked near the lake and took photos", alt: [], ipa: "/wiː wɔːkt nɪər ðə leɪk ənd tʊk ˈfoʊtoʊz/", es: "uí uókt níar de léik and tuk fóu-tous", meaning: "Caminamos cerca del lago y tomamos fotos", tip: "'Near' significa cerca de." },
+              { text: "It was a great trip to recharge energy", alt: [], ipa: "/ɪt wɒz ə ɡreɪt trɪp tə ˌriːˈtʃɑːrdʒ ˈenərdʒi/", es: "it uós a gréit trip tu ri-charch é-ner-yi", meaning: "Fue un gran viaje para recargar energía", tip: "'Trip' es viaje corto o escapada." }
+            ]
+          },
+          {
+            id: "story_shopping_coffee_a2",
+            title: "📖 Historia A2: Tarde de compras y café",
+            rule: "Preferencias, comparaciones y pedidos en cafetería",
+            theory: "Une expresiones para comparar opciones ('cheaper than', 'better'), indicar preferencias ('prefer', 'would like') y pedir alimentos o bebidas de forma cortés.",
+            formula: "Preferencia: I prefer + [A] + to + [B] | Pedido: Can I have + [item], please?",
+            why: "Con 'prefer' al comparar dos sustantivos se suele usar 'to' ('I prefer coffee to tea') más que 'than'.",
+            items: [
+              { text: "I needed a new jacket for winter", alt: [], ipa: "/aɪ ˈniːdɪd ə njuː ˈdʒækɪt fɔːr ˈwɪntər/", es: "ái níi-did a niú yá-ket for uín-ter", meaning: "Necesitaba una campera nueva para el invierno", tip: "'Jacket' lleva acento en 'JACK' ('yá-ket')." },
+              { text: "This coat was warmer than the other one", alt: [], ipa: "/ðɪs koʊt wɒz ˈwɔːrmər ðæn ði ˈʌðər wʌn/", es: "dis kóut uós uór-mer dan di á-der uán", meaning: "Este abrigo era más abrigado que el otro", tip: "'Warm' significa tibio o abrigado." },
+              { text: "It wasn't too expensive so I bought it", alt: [], ipa: "/ɪt ˈwɒznt tuː ɪkˈspensɪv soʊ aɪ bɔːt ɪt/", es: "it uó-sent tu iks-pén-siv sóu ái bot it", meaning: "No era demasiado caro así que lo compré", tip: "'Too expensive' significa 'demasiado caro'." },
+              { text: "After shopping I stopped at a quiet cafe", alt: [], ipa: "/ˈɑːftər ˈʃɒpɪŋ aɪ stɒpt æt ə ˈkwaɪət ˈkæfeɪ/", es: "áf-ter shó-ping ái stopt at a kuái-et ka-féi", meaning: "Después de comprar paré en una cafetería tranquila", tip: "'Stopped' duplica la 'p' al formar el pasado." },
+              { text: "Can I have a black coffee please", alt: [], ipa: "/kæn aɪ hæv ə blæk ˈkɒfi pliːz/", es: "kan ái jav a blak kó-fi plíis", meaning: "¿Me das un café negro por favor?", tip: "'Can I have...?' es una forma muy natural y cortés de pedir." },
+              { text: "I sat by the window and relaxed", alt: [], ipa: "/aɪ sæt baɪ ðə ˈwɪndoʊ ənd rɪˈlækst/", es: "ái sat bái de uín-dou and ri-lákst", meaning: "Me senté junto a la ventana y me relajé", tip: "'Sat' es el pasado irregular de 'sit' (sentarse)." }
+            ]
+          },
+          {
+            id: "story_work_projects_a2",
+            title: "📖 Historia A2: Reuniones, revisiones y proyectos",
+            rule: "Inglés práctico para trabajo y resolución de problemas",
+            theory: "Combina presente simple, pasado y futuro ('going to') para hablar de tareas diarias, revisiones técnicas, ajustes de diseño y avances de proyecto.",
+            formula: "Estado/Acción + complemento | We're going to + acción planificada",
+            why: "En entornos laborales claros y directos, las frases cortas con sujeto explícito ('We checked...', 'The valve works...') evitan ambigüedades.",
+            items: [
+              { text: "We reviewed the drawing before the meeting", alt: [], ipa: "/wiː ˌriːˈvjuːd ðə ˈdrɔːɪŋ bɪˈfɔːr ðə ˈmiːtɪŋ/", es: "uí ri-viúud de dró-ing bi-fór de míi-ting", meaning: "Revisamos el plano antes de la reunión", tip: "'Drawing' aquí significa plano o dibujo técnico ('dró-ing')." },
+              { text: "The test pressure is stable now", alt: [], ipa: "/ðə test ˈpreʃər ɪz ˈsteɪbl naʊ/", es: "de test pré-sher is stéi-bol náu", meaning: "La presión de prueba ahora es estable", tip: "'Stable' suena parecido a 'stéi-bol'." },
+              { text: "Let's check the parts list together", alt: [], ipa: "/lets tʃek ðə pɑːrts lɪst təˈɡeðər/", es: "lets chek de parts list tu-gué-der", meaning: "Revisemos juntos la lista de materiales", tip: "'Parts list' = lista de piezas o materiales." },
+              { text: "We fixed the small leak this morning", alt: [], ipa: "/wiː fɪkst ðə smɔːl liːk ðɪs ˈmɔːrnɪŋ/", es: "uí fikst de smol líik dis mór-ning", meaning: "Solucionamos la pequeña fuga esta mañana", tip: "'Leak' es fuga o pérdida ('líik')." },
+              { text: "I'm going to send the updated version today", alt: [], ipa: "/aɪm ˈɡoʊɪŋ tə send ði ˌʌpˈdeɪtɪd ˈvɜːrʒn təˈdeɪ/", es: "áim góu-ing tu send di ap-déi-ted vér-shon tu-déi", meaning: "Voy a enviar la versión actualizada hoy", tip: "'Updated' significa actualizado." },
+              { text: "Everything is ready for the next step", alt: [], ipa: "/ˈevriθɪŋ ɪz ˈredi fɔːr ðə nekst step/", es: "év-ri-zing is ré-di for de nekst step", meaning: "Todo está listo para el siguiente paso", tip: "'Next step' = próximo paso." }
+            ]
+          }
+        ]
+      }
+    ],
+    QA: [
+      {
+        unit: "Preguntas y Respuestas Rápidas (Simulador de Reflejo)",
+        topics: [
+          {
+            id: "qa_a1_basics",
+            title: "⚡ Q&A A1: Presentaciones, hora y rutinas",
+            rule: "Responder preguntas con 'be', 'do' y 'can'",
+            theory: "Al responder una pregunta en inglés, miramos el verbo con el que nos preguntan: si preguntan con 'Are you...?', respondemos con 'I'm...'; si preguntan con 'Do you...?', respondemos con 'I...'.",
+            formula: "Are you...? -> I'm... | Do you...? -> I + verbo | Can you...? -> I can...",
+            why: "Responder usando la misma estructura del verbo principal hace que la respuesta suene natural y ordenada.",
+            items: [
+              { question: "Where are you from?", text: "I'm from Argentina", alt: ["i am from argentina", "argentina"], ipa: "/aɪm frɒm ˌɑːrdʒənˈtiːnə/", es: "áim from ar-yen-tíi-na", meaning: "Soy de Argentina", tip: "Puedes decir la frase completa o solo el país." },
+              { question: "What time do you get up?", text: "I get up at seven", alt: ["i get up at 7", "at seven", "at 7"], ipa: "/aɪ ɡet ʌp æt ˈsevn/", es: "ái guet ap at sé-ven", meaning: "Me levanto a las siete", tip: "Usa 'at' antes de la hora ('at seven')." },
+              { question: "Can you speak English?", text: "Yes, a little", alt: ["yes a little", "yes i can", "yes"], ipa: "/jes ə ˈlɪtl/", es: "ies a lí-tol", meaning: "Sí, un poco", tip: "'A little' es una respuesta muy natural cuando estás aprendiendo." },
+              { question: "How do you go to work?", text: "I go by bus", alt: ["i go to work by bus", "by bus"], ipa: "/aɪ ɡoʊ baɪ bʌs/", es: "ái góu bái bas", meaning: "Voy en autobús", tip: "Recuerda 'by bus' sin artículo." },
+              { question: "What do you like doing at the weekend?", text: "I like watching films", alt: ["i like watching movies", "watching films"], ipa: "/aɪ laɪk ˈwɒtʃɪŋ fɪlmz/", es: "ái láik uó-ching films", meaning: "Me gusta ver películas", tip: "Tras 'like' usamos '-ing' ('watching')." },
+              { question: "How was your day?", text: "It was very good", alt: ["it was good", "very good", "good"], ipa: "/ɪt wɒz ˈveri ɡʊd/", es: "it uós vé-ri gud", meaning: "Estuvo muy bueno", tip: "Como pregunta en pasado con 'was', responde con 'It was...'." }
+            ]
+          },
+          {
+            id: "qa_a2_daily",
+            title: "⚡ Q&A A2: Experiencias, planes y decisiones",
+            rule: "Respuestas ágiles en pasado, presente perfecto y planes",
+            theory: "En nivel A2 es útil dar respuestas breves pero completas: sumar un detalle de tiempo ('last week', 'tomorrow') o motivo ('because...') enriquece la conversación.",
+            formula: "Respuesta directa + detalle de tiempo o motivo",
+            why: "Agregar un dato extra ('on Saturday', 'because I have work') muestra fluidez sin necesidad de oraciones largas.",
+            items: [
+              { question: "Did you have a good weekend?", text: "Yes, I did, I relaxed at home", alt: ["yes i did", "yes it was great", "yes"], ipa: "/jes aɪ dɪd aɪ rɪˈlækst æt hoʊm/", es: "ies ái did, ái ri-lákst at jóum", meaning: "Sí, descansé en casa", tip: "La respuesta corta en pasado con 'did' es 'Yes, I did'." },
+              { question: "What are you going to do tomorrow?", text: "I'm going to work in the morning", alt: ["i am going to work in the morning", "i am going to work"], ipa: "/aɪm ˈɡoʊɪŋ tə wɜːrk ɪn ðə ˈmɔːrnɪŋ/", es: "áim góu-ing tu uérk in de mór-ning", meaning: "Voy a trabajar por la mañana", tip: "Usa 'going to' cuando ya tienes un plan." },
+              { question: "Have you ever visited another country?", text: "Yes, I have", alt: ["yes i have", "yes"], ipa: "/jes aɪ hæv/", es: "ies ái jav", meaning: "Sí, lo he hecho", tip: "Con 'Have you ever...?' se responde 'Yes, I have' o 'No, I haven't'." },
+              { question: "Why do you study every day?", text: "Because I want to improve", alt: ["because i want to improve my english"], ipa: "/bɪˈkɒz aɪ wɒnt tə ɪmˈpruːv/", es: "bi-kós ái uónt tu em-prúuv", meaning: "Porque quiero mejorar", tip: "'Improve' significa mejorar ('em-PRÚUV')." },
+              { question: "Which option is better?", text: "The first one is better", alt: ["the first one", "first one"], ipa: "/ðə fɜːrst wʌn ɪz ˈbetər/", es: "de ferst uán is bé-ter", meaning: "La primera es mejor", tip: "'One' aquí sustituye a la opción para no repetirla." },
+              { question: "Would you like some coffee?", text: "Yes, please", alt: ["yes please", "id love some", "i would love some"], ipa: "/jes pliːz/", es: "ies plíis", meaning: "Sí, por favor", tip: "'Yes, please' o 'No, thank you' son respuestas clave de cortesía." }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  function getTodayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+
+  function getYesterdayStr() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+
+  let state = JSON.parse(localStorage.getItem("dailyEnglishCoachState_v5")) || {
+    currentLevel: "A1",
+    currentTopicId: "a1_1a",
+    cardIndex: 0,
+    completedTopics: [],
+    xp: 0,
+    streak: 0,
+    lastPracticeDate: null,
+    theoryVisible: true
+  };
+
+  function saveState() {
+    localStorage.setItem("dailyEnglishCoachState_v5", JSON.stringify(state));
+  }
+
+  function registerDailyActivity(points) {
+    state.xp += points;
+    const today = getTodayStr();
+    const yesterday = getYesterdayStr();
+
+    if (state.lastPracticeDate === today) {
+      // Mismo día
+    } else if (state.lastPracticeDate === yesterday) {
+      state.streak += 1;
+      state.lastPracticeDate = today;
+    } else {
+      state.streak = 1;
+      state.lastPracticeDate = today;
+    }
+    saveState();
+    renderStats();
+  }
+
+  function renderStats() {
+    document.getElementById("xp-pill").textContent = `⭐ ${state.xp} XP`;
+    const streakText = state.streak === 1 ? "1 día" : `${state.streak} días`;
+    document.getElementById("streak-banner").textContent = `🔥 Racha: ${streakText}`;
+  }
+
+  function applyTheoryVisibility() {
+    const grid = document.getElementById("columns-grid");
+    if (state.theoryVisible) {
+      grid.classList.remove("theory-hidden");
+    } else {
+      grid.classList.add("theory-hidden");
+    }
+  }
+
+  function toggleTheoryPanel() {
+    state.theoryVisible = !state.theoryVisible;
+    saveState();
+    applyTheoryVisibility();
+  }
+
+  function findTopicById(id) {
+    for (const lvl of ["A1", "A2", "DAILY", "QA"]) {
+      for (const unitObj of database[lvl]) {
+        const found = unitObj.topics.find(t => t.id === id);
+        if (found) return { level: lvl, unit: unitObj.unit, topic: found };
+      }
+    }
+    return null;
+  }
+
+  function switchLevel(lvl) {
+    state.currentLevel = lvl;
+    const firstTopic = database[lvl][0].topics[0];
+    state.currentTopicId = firstTopic.id;
+    state.cardIndex = 0;
+    saveState();
+    resetFeedback();
+    renderAll();
+  }
+
+  function selectTopic(topicId) {
+    state.currentTopicId = topicId;
+    state.cardIndex = 0;
+    saveState();
+    resetFeedback();
+    renderAll();
+  }
+
+  function renderSidebar() {
+    ["A1", "A2", "DAILY", "QA"].forEach(lvl => {
+      const el = document.getElementById(`tab-${lvl}`);
+      if (el) el.className = `level-tab ${state.currentLevel === lvl ? "active" : ""}`;
+    });
+
+    const container = document.getElementById("topics-list");
+    container.innerHTML = "";
+
+    database[state.currentLevel].forEach(unitObj => {
+      const group = document.createElement("div");
+      group.className = "unit-group";
+
+      const uTitle = document.createElement("div");
+      uTitle.className = "unit-title";
+      uTitle.textContent = unitObj.unit;
+      group.appendChild(uTitle);
+
+      unitObj.topics.forEach(topic => {
+        const isCompleted = state.completedTopics.includes(topic.id);
+        const isActive = state.currentTopicId === topic.id;
+
+        const btn = document.createElement("button");
+        btn.className = `topic-btn ${isActive ? "active" : ""} ${isCompleted ? "completed" : ""}`;
+        btn.innerHTML = `
+          <span>${topic.title}</span>
+          <span class="topic-status">${isCompleted ? "✅" : `${topic.items.length}`}</span>
+        `;
+        btn.onclick = () => selectTopic(topic.id);
+        group.appendChild(btn);
+      });
+
+      container.appendChild(group);
+    });
+  }
+
+  function renderCard() {
+    const data = findTopicById(state.currentTopicId);
+    if (!data) return;
+
+    const { level, unit, topic } = data;
+    const item = topic.items[state.cardIndex];
+
+    const levelMap = {
+      A1: "A1",
+      A2: "A2",
+      DAILY: "Diario & Historias",
+      QA: "Q&A Rápido"
+    };
+
+    document.getElementById("topic-badge").textContent = `${levelMap[level]} • ${unit}`;
+    document.getElementById("topic-title").textContent = topic.title;
+    document.getElementById("card-step").textContent = `Tarjeta ${state.cardIndex + 1} de ${topic.items.length}`;
+    document.getElementById("progress-fill").style.width = `${(state.cardIndex / topic.items.length) * 100}%`;
+
+    const qBox = document.getElementById("question-box");
+    const listenBtn = document.getElementById("listen-btn");
+    const micBtn = document.getElementById("mic-btn");
+
+    if (item.question) {
+      qBox.style.display = "block";
+      document.getElementById("question-text").textContent = item.question;
+      listenBtn.textContent = "🔊 Modelo";
+      micBtn.textContent = "🎤 Responder";
+    } else {
+      qBox.style.display = "none";
+      listenBtn.textContent = "🔊 Normal";
+      micBtn.textContent = "🎤 Hablar";
+    }
+
+    document.getElementById("prompt-text").textContent = item.text;
+    document.getElementById("phonetic-ipa").textContent = item.ipa;
+    document.getElementById("phonetic-es").textContent = `🗣️ ${item.es}`;
+    document.getElementById("meaning-text").textContent = item.meaning;
+    document.getElementById("tip-box").textContent = `💡 ${item.tip}`;
+
+    // Panel derecho de teoría
+    document.getElementById("rule-pill").textContent = `Regla: ${topic.rule}`;
+    document.getElementById("theory-body").textContent = topic.theory;
+    document.getElementById("structure-formula").textContent = topic.formula;
+    document.getElementById("mini-note").innerHTML = `<strong>¿Por qué se escribe así?</strong> ${topic.why}`;
+  }
+
+  function renderAll() {
+    applyTheoryVisibility();
+    renderStats();
+    renderSidebar();
+    renderCard();
+  }
+
+  function resetFeedback() {
+    const data = findTopicById(state.currentTopicId);
+    const isQA = data && data.topic.items[state.cardIndex] && data.topic.items[state.cardIndex].question;
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback";
+    if (isQA) {
+      fb.innerHTML = `Lee la pregunta, presiona <strong>"Responder"</strong> y di la respuesta modelo (o una válida).`;
+    } else {
+      fb.innerHTML = `Presiona <strong>"Hablar"</strong> y pronuncia la frase en inglés. No avanzarás hasta decirla correctamente.`;
+    }
+  }
+
+  function speakText(rate) {
+    const data = findTopicById(state.currentTopicId);
+    const item = data.topic.items[state.cardIndex];
+    const utterance = new SpeechSynthesisUtterance(item.text);
+    utterance.lang = "en-US";
+    utterance.rate = rate;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  }
+
+  document.getElementById("listen-btn").onclick = () => speakText(0.95);
+  document.getElementById("slow-btn").onclick = () => speakText(0.65);
+
+  function normalize(str) {
+    return str
+      .toLowerCase()
+      .replace(/i'm/g, "i am")
+      .replace(/i'll/g, "i will")
+      .replace(/let's/g, "let us")
+      .replace(/you're/g, "you are")
+      .replace(/he's/g, "he is")
+      .replace(/she's/g, "she is")
+      .replace(/it's/g, "it is")
+      .replace(/we're/g, "we are")
+      .replace(/they're/g, "they are")
+      .replace(/isn't/g, "is not")
+      .replace(/aren't/g, "are not")
+      .replace(/wasn't/g, "was not")
+      .replace(/weren't/g, "were not")
+      .replace(/don't/g, "do not")
+      .replace(/doesn't/g, "does not")
+      .replace(/didn't/g, "did not")
+      .replace(/can't/g, "cannot")
+      .replace(/haven't/g, "have not")
+      .replace(/hasn't/g, "has not")
+      .replace(/i've/g, "i have")
+      .replace(/we've/g, "we have")
+      .replace(/i'd/g, "i would")
+      .replace(/that's/g, "that is")
+      .replace(/what's/g, "what is")
+      .replace(/where's/g, "where is")
+      .replace(/there's/g, "there is")
+      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?¿¡!']/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = document.getElementById("mic-btn");
+  const sessionBtn = document.getElementById("mic-session-btn");
+  const feedback = document.getElementById("feedback");
+
+  let recognition = null;
+  let isListening = false;
+
+  function initRecognition() {
+    if (!SpeechRecognition || recognition) return;
+    recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 4;
+
+    recognition.onstart = () => {
+      isListening = true;
+      sessionBtn.classList.add("ready");
+      sessionBtn.textContent = "✅ Micrófono habilitado";
+      micBtn.classList.add("recording");
+      micBtn.textContent = "🎙️ Escuchando...";
+      feedback.className = "feedback";
+      feedback.textContent = "Te escucho... habla con claridad.";
+    };
+
+    recognition.onresult = (event) => {
+      const results = Array.from(event.results[0]).map(r => normalize(r.transcript));
+      const spokenMain = event.results[0][0].transcript;
+
+      const data = findTopicById(state.currentTopicId);
+      const topic = data.topic;
+      const currentItem = topic.items[state.cardIndex];
+
+      const validTargets = [normalize(currentItem.text), ...currentItem.alt.map(normalize)];
+      const isMatch = results.some(res => validTargets.includes(res));
+
+      if (isMatch) {
+        registerDailyActivity(10);
+        feedback.className = "feedback success";
+        feedback.innerHTML = `✅ <strong>¡Muy bien! (+10 XP)</strong> Escuché: "${spokenMain}"`;
+
+        setTimeout(() => {
+          if (state.cardIndex + 1 < topic.items.length) {
+            state.cardIndex++;
+            resetFeedback();
+          } else {
+            registerDailyActivity(25);
+            document.getElementById("progress-fill").style.width = "100%";
+            if (!state.completedTopics.includes(topic.id)) {
+              state.completedTopics.push(topic.id);
+            }
+            state.cardIndex = 0;
+            feedback.className = "feedback success";
+            feedback.innerHTML = `🎉 <strong>¡Tema completado! (+25 XP extra)</strong> Elige otro tema en el menú o vuelve a practicar.`;
+          }
+          saveState();
+          renderAll();
+        }, 1150);
+      } else {
+        feedback.className = "feedback error";
+        feedback.innerHTML = `❌ Escuché: "<strong>${spokenMain}</strong>". Sigue bloqueado en esta tarjeta, inténtalo de nuevo.`;
+      }
+    };
+
+    recognition.onerror = (event) => {
+      isListening = false;
+      micBtn.classList.remove("recording");
+      const data = findTopicById(state.currentTopicId);
+      const isQA = data && data.topic.items[state.cardIndex] && data.topic.items[state.cardIndex].question;
+      micBtn.textContent = isQA ? "🎤 Responder" : "🎤 Hablar";
+
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+        sessionBtn.classList.remove("ready");
+        sessionBtn.textContent = "🎙️ Habilitar Micrófono (1 sola vez)";
+        feedback.className = "feedback error";
+        feedback.textContent = "Permiso de micrófono bloqueado. Haz clic en el ícono de la barra de Chrome y selecciona Permitir.";
+      } else if (event.error === "no-speech") {
+        feedback.className = "feedback error";
+        feedback.textContent = "No detecté voz. Presiona el botón y habla un poco más cerca del micrófono.";
+      } else {
+        feedback.className = "feedback error";
+        feedback.textContent = `Aviso de audio (${event.error}). Intenta presionar nuevamente.`;
+      }
+    };
+
+    recognition.onend = () => {
+      isListening = false;
+      micBtn.classList.remove("recording");
+      const data = findTopicById(state.currentTopicId);
+      const isQA = data && data.topic.items[state.cardIndex] && data.topic.items[state.cardIndex].question;
+      micBtn.textContent = isQA ? "🎤 Responder" : "🎤 Hablar";
+    };
+  }
+
+  async function requestPersistentMic() {
+    if (!SpeechRecognition) return;
+    initRecognition();
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop());
+        sessionBtn.classList.add("ready");
+        sessionBtn.textContent = "✅ Micrófono habilitado";
+        feedback.className = "feedback success";
+        feedback.innerHTML = `✅ <strong>Micrófono listo.</strong> Ya quedó habilitado; ahora solo presiona el botón de voz en cada tarjeta.`;
+      } catch (err) {
+        feedback.className = "feedback error";
+        feedback.textContent = "No se pudo habilitar el micrófono. Revisa los permisos de Chrome para este archivo.";
+      }
+    }
+  }
+
+  if (!SpeechRecognition) {
+    feedback.className = "feedback error";
+    feedback.textContent = "Tu navegador no soporta reconocimiento de voz. Ábrelo en Google Chrome.";
+    micBtn.disabled = true;
+    sessionBtn.disabled = true;
+  } else {
+    initRecognition();
+    micBtn.onclick = () => {
+      if (!recognition) initRecognition();
+      if (isListening) {
+        recognition.stop();
+        return;
+      }
+      try {
+        recognition.start();
+      } catch (e) {
+        recognition.stop();
+        setTimeout(() => recognition.start(), 120);
+      }
+    };
+  }
+
+  document.getElementById("restart-topic-btn").onclick = () => {
+    state.cardIndex = 0;
+    saveState();
+    renderCard();
+    resetFeedback();
+  };
+
+  document.getElementById("reset-all-btn").onclick = () => {
+    if (confirm("¿Seguro que quieres borrar todo tu progreso, racha y XP?")) {
+      state = {
+        currentLevel: "A1",
+        currentTopicId: "a1_1a",
+        cardIndex: 0,
+        completedTopics: [],
+        xp: 0,
+        streak: 0,
+        lastPracticeDate: null,
+        theoryVisible: true
+      };
+      saveState();
+      renderAll();
+      resetFeedback();
+    }
+  };
+
+  renderAll();
+</script>
+</body>
+</html>
